@@ -1,0 +1,563 @@
+/*
+ * V Portfolio — Global Styles & Design System
+ * PRD Reference: §5.2 Color System, §5.3 Typography, §5.4 Spacing, §5.5 Motion, §5.6 Component Tokens
+ *
+ * Architecture notes:
+ * - Design tokens defined as CSS custom properties on :root
+ * - @layer used for cascade management per modern-web-guidance
+ * - prefers-reduced-motion: uses @property pattern (NOT global animation-duration override)
+ * - Self-hosted fonts via @font-face — zero CDN dependency
+ */
+
+/* ─── Cascade Layer Declaration ─────────────────────────────────────────────
+   Explicit layer order ensures predictable specificity:
+   reset < base < tokens < components < utilities
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer reset, base, tokens, components, utilities;
+
+/* ─── Tailwind Directives ────────────────────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Self-Hosted Font Declarations ─────────────────────────────────────────
+   All fonts served from /fonts/ — no Google Fonts CDN requests.
+   font-size-adjust: from-font ensures stable layout during font swap (WCAG CLS).
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Inter 400 (body text) */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Inter 500 (medium labels, nav items) */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Inter 600 (card titles, semi-bold headings) */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-600-normal.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Inter 700 (section headings) */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Inter 800 (hero headline, display text) */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-800-normal.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* JetBrains Mono 400 (code, stats, terminal text) */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-latin-400-normal.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* JetBrains Mono 500 (LeetCode stats, GitHub numbers) */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-latin-500-normal.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ─── Design Tokens (CSS Custom Properties) ─────────────────────────────────
+   PRD §5.2 — Color System
+   PRD §5.3 — Typography System
+   PRD §5.4 — Spacing System
+   PRD §5.5 — Motion System
+   PRD §5.6 — Component Token Rules
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer tokens {
+  :root {
+    /* ── Color: Backgrounds ── */
+    --bg-base:      #0A0A0B; /* Page background — near black, not pure black */
+    --bg-surface:   #111113; /* Card surfaces, sidebar backgrounds */
+    --bg-elevated:  #1A1A1D; /* Modal backgrounds, elevated panels */
+    --bg-border:    #2A2A2E; /* Subtle borders, dividers */
+
+    /* ── Color: Text ── */
+    --text-primary:   #FAFAFA; /* Headlines, primary body text */
+    --text-secondary: #A1A1AA; /* Subtext, captions, metadata */
+    --text-muted:     #71717A; /* Placeholder text, disabled states */
+
+    /* ── Color: Accent ── */
+    --accent-blue:      #3B82F6; /* Primary accent — CTAs, links, highlights */
+    --accent-blue-dark: #1D4ED8; /* Hover state for accent elements */
+    --accent-glow:      rgba(59, 130, 246, 0.15); /* Subtle glow for accent elements */
+
+    /* ── Color: Status ── */
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-error:   #ef4444;
+
+    /* ── Color: shadcn/ui compatibility variables ── */
+    /* These map shadcn's internal tokens to our design system */
+    --background:   var(--bg-base);
+    --foreground:   var(--text-primary);
+    --card:         var(--bg-surface);
+    --card-foreground: var(--text-primary);
+    --popover:      var(--bg-elevated);
+    --popover-foreground: var(--text-primary);
+    --primary:      var(--accent-blue);
+    --primary-foreground: #FFFFFF;
+    --secondary:    var(--bg-surface);
+    --secondary-foreground: var(--text-secondary);
+    --muted:        var(--bg-elevated);
+    --muted-foreground: var(--text-muted);
+    --accent:       var(--accent-blue);
+    --accent-foreground: #FFFFFF;
+    --destructive:  var(--color-error);
+    --destructive-foreground: #FFFFFF;
+    --border:       var(--bg-border);
+    --input:        var(--bg-border);
+    --ring:         var(--accent-blue);
+    --radius:       12px; /* --radius-md as default */
+
+    /* ── Typography: Font Families ── */
+    --font-display: 'Inter', system-ui, sans-serif;
+    --font-body:    'Inter', system-ui, sans-serif;
+    --font-mono:    'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+    /* ── Typography: Scale ── */
+    --text-hero:        clamp(3rem, 7vw, 5rem);      /* 48px → 80px */
+    --text-section:     clamp(2rem, 5vw, 3.5rem);    /* 32px → 56px */
+    --text-card-title:  clamp(1.25rem, 2vw, 1.5rem); /* 20px → 24px */
+    --text-body:        clamp(1rem, 1.5vw, 1.125rem); /* 16px → 18px */
+    --text-small:       0.875rem;                     /* 14px */
+    --text-mono:        0.875rem;                     /* 14px */
+
+    /* ── Typography: Line Heights ── */
+    --line-height-tight: 1.15; /* Headlines only */
+    --line-height-body:  1.65; /* All body copy */
+
+    /* ── Typography: Letter Spacing ── */
+    --letter-spacing-tight: -0.03em; /* Large display text */
+    --letter-spacing-wide:  0.08em;  /* Small caps labels */
+
+    /* ── Spacing: 8-point grid (PRD §5.4) ── */
+    --space-1:  4px;
+    --space-2:  8px;
+    --space-3:  16px;
+    --space-4:  24px;
+    --space-5:  32px;
+    --space-6:  48px;
+    --space-7:  64px;
+    --space-8:  96px;
+    --space-9:  128px;
+    --space-10: 192px;
+
+    /* ── Layout ── */
+    --max-width-content:  1200px;
+    --max-width-hero:     900px;
+    --max-width-subcopy:  560px;
+    --section-padding-y:  clamp(4rem, 10vw, 10rem); /* 64px → 160px */
+    --card-padding:       clamp(2rem, 3vw, 2.5rem);  /* 32px → 40px */
+
+    /* ── Border Radius (PRD §5.6) ── */
+    --radius-sm:   6px;
+    --radius-md:   12px;
+    --radius-lg:   20px;
+    --radius-full: 9999px;
+
+    /* ── Box Shadows (PRD §5.6) ── */
+    --shadow-card:      0 1px 2px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3);
+    --shadow-card-hover: 0 1px 2px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.4);
+    --shadow-glow-blue: 0 0 0 1px rgba(59,130,246,0.3), 0 4px 24px rgba(59,130,246,0.15);
+
+    /* ── Motion: Durations (PRD §5.5) ── */
+    --duration-fast:   200ms;
+    --duration-normal: 300ms;
+    --duration-slow:   500ms;
+    --duration-enter:  600ms;
+
+    /* ── Motion: Easings ── */
+    --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);   /* Spring-like ease-out */
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* ── Gradient: Hero (PRD §5.5, §7.1) ── */
+    /* Used as fallback before Liquid Ether loads (Wave 5) */
+    --gradient-hero: radial-gradient(
+      ellipse at 60% 40%,
+      rgba(30, 64, 175, 0.4) 0%,
+      rgba(79, 70, 229, 0.2) 40%,
+      rgba(10, 10, 11, 0) 70%
+    );
+
+    /* ── Glassmorphism token (PRD §5.6) ── */
+    --glass-bg:     rgba(255, 255, 255, 0.04);
+    --glass-blur:   blur(12px);
+    --glass-border: rgba(255, 255, 255, 0.06);
+  }
+}
+
+/* ─── Base / Reset Layer ─────────────────────────────────────────────────────
+   Minimal reset that respects native browser behavior.
+   No global `*` reset per modern-web-guidance guidance.
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  /* Color scheme: dark-only for V1 per PRD §16.3 deferral list */
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    /* Smooth scrolling for anchor navigation */
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: var(--line-height-body);
+    /* Stable font rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size-adjust: from-font;
+    /* Prevent horizontal scroll */
+    overflow-x: hidden;
+    /* Prevent layout shift from scrollbar appearing */
+    scrollbar-gutter: stable;
+  }
+
+  /* Heading defaults — use token scale */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    color: var(--text-primary);
+    text-wrap: balance;
+  }
+
+  /* Body text wrapping — prettier line breaks */
+  p {
+    text-wrap: pretty;
+    overflow-wrap: break-word;
+  }
+
+  /* Links — use accent blue by default */
+  a {
+    color: var(--accent-blue);
+    text-decoration: none;
+  }
+
+  a:hover:not(:disabled) {
+    color: var(--accent-blue-dark);
+  }
+
+  /* Monospace elements */
+  code, kbd, samp, pre {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+  }
+
+  /* Images: prevent layout shift by default */
+  img, video {
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+
+  /* Focus rings: use :focus-visible, never :focus (per modern-web-guidance §4) */
+  :focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Remove focus ring from elements that don't need it (mouse clicks) */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Touch targets: minimum 44×44px on coarse pointers (WCAG 2.5.8) */
+  @media (pointer: coarse) {
+    button, a, [role='button'], input[type='checkbox'], input[type='radio'] {
+      min-block-size: 44px;
+      min-inline-size: 44px;
+    }
+  }
+
+  /* Scrollbar styling — subtle, matches dark theme */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg-base);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--bg-border);
+    border-radius: var(--radius-full);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+  }
+
+  /* Standard scrollbar (Firefox) */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg-border) var(--bg-base);
+  }
+
+  /* Selection color */
+  ::selection {
+    background-color: var(--accent-glow);
+    color: var(--text-primary);
+  }
+}
+
+/* ─── prefers-reduced-motion ─────────────────────────────────────────────────
+   Uses @property pattern from modern-web-guidance (§9 Accessibility).
+   DO NOT use global `animation-duration: 0.01ms` — it can make some
+   animations MORE jarring (e.g. infinite loaders become instant flickers).
+   Instead, components set --animation-reduced for their specific animations.
+   ─────────────────────────────────────────────────────────────────────────── */
+@property --animation-reduced {
+  syntax: '*';
+  inherits: false;
+  initial-value: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Disable scroll behavior */
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Apply reduced animation to ALL elements via the custom property hook */
+  * {
+    animation: var(--animation-reduced) !important;
+  }
+
+  /* Disable transitions for motion-sensitive users */
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ─── Utility Components ─────────────────────────────────────────────────────
+   Reusable utility classes built on design tokens.
+   These supplement Tailwind utilities for patterns used frequently.
+   ─────────────────────────────────────────────────────────────────────────── */
+@layer components {
+  /* Section container — max width with auto margins */
+  .section-container {
+    max-width: var(--max-width-content);
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 5vw, var(--space-7));
+  }
+
+  /* Section vertical rhythm */
+  .section-padding {
+    padding-block: var(--section-padding-y);
+  }
+
+  /* Gradient text — hero headline accent (PRD §5.6) */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--accent-blue), #818cf8);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent; /* Fallback */
+  }
+
+  /* Glassmorphism card — max 2-3 elements per page (PRD §5.6) */
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* Card with elevation shadow */
+  .card-elevated {
+    background: var(--bg-surface);
+    border: 1px solid var(--bg-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    padding: var(--card-padding);
+    transition: box-shadow var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out);
+  }
+
+  /* Card hover lift (PRD §5.5, §7.5.1) */
+  .card-elevated:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-4px);
+    border-color: rgba(59, 130, 246, 0.2);
+  }
+
+  /* Accent button glow (PRD §5.6) */
+  .btn-accent {
+    background-color: var(--accent-blue);
+    color: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 0 var(--space-4);
+    height: 48px;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out);
+  }
+
+  .btn-accent:hover:not(:disabled) {
+    background-color: var(--accent-blue-dark);
+    box-shadow: var(--shadow-glow-blue);
+  }
+
+  /* Ghost / outline button */
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--bg-border);
+    border-radius: var(--radius-md);
+    padding: 0 var(--space-4);
+    height: 48px;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                border-color var(--duration-fast) var(--ease-out);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background-color: var(--bg-surface);
+    border-color: var(--text-muted);
+  }
+
+  /* Status badge pill */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .badge-published {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+  }
+
+  .badge-draft {
+    background: rgba(113, 113, 122, 0.1);
+    color: var(--text-muted);
+    border: 1px solid rgba(113, 113, 122, 0.2);
+  }
+
+  /* Section label — small caps above headings */
+  .section-label {
+    display: inline-block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: var(--letter-spacing-wide);
+    text-transform: uppercase;
+    color: var(--accent-blue);
+  }
+
+  /* Pulsing status dot — used in Now section and admin */
+  .pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: var(--color-success);
+    animation: pulse-dot 2s ease-in-out infinite;
+    --animation-reduced: none; /* Reduced motion: stops pulsing */
+  }
+
+  /* Screen reader only — visually hidden but accessible */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .sr-only:focus,
+  .sr-only:focus-within {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: var(--space-2) var(--space-3);
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+}
+
+/* ─── Keyframe Animations ────────────────────────────────────────────────────
+   All keyframes defined here. Framer Motion will override these at runtime
+   for section entry animations. These CSS keyframes are for simple CSS-only
+   cases (pulse dot, scroll indicator).
+   ─────────────────────────────────────────────────────────────────────────── */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.85); }
+}
+
+@keyframes scroll-chevron {
+  0%, 100% { transform: translateY(0);   opacity: 1; }
+  50%       { transform: translateY(6px); opacity: 0.6; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Gradient interpolation space support ───────────────────────────────────
+   Technique from modern-web-guidance §8.3 — safe oklab/oklch fallback
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  --in-oklab: ;
+  --in-oklch: ;
+}
+
+@supports (background: linear-gradient(in oklab, white, black)) {
+  :root {
+    --in-oklab: in oklab;
+    --in-oklch: in oklch;
+  }
+}
