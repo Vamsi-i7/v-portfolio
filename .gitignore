@@ -36,3 +36,4 @@ stats.html
 
 # Supabase CLI
 .supabase/
+supabase/.temp/
