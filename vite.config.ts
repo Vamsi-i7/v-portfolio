@@ -29,13 +29,24 @@ export default defineConfig(({ mode }) => ({
       output: {
         // Manual code splitting: Three.js must NEVER be in the initial bundle
         // Admin dashboard chunk will be added when admin routes are implemented
-        manualChunks: {
-          // Vendor chunk for stable dependencies
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-motion': ['framer-motion'],
-          'vendor-forms': ['react-hook-form', 'zod', '@hookform/resolvers'],
-          'vendor-supabase': ['@supabase/supabase-js'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'vendor-react';
+            }
+            if (id.includes('@tanstack/react-query')) {
+              return 'vendor-query';
+            }
+            if (id.includes('framer-motion')) {
+              return 'vendor-motion';
+            }
+            if (id.includes('react-hook-form') || id.includes('zod') || id.includes('@hookform/resolvers')) {
+              return 'vendor-forms';
+            }
+            if (id.includes('@supabase/supabase-js')) {
+              return 'vendor-supabase';
+            }
+          }
         },
       },
     },
