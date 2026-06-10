@@ -14,7 +14,7 @@ export function AdminLayout() {
   return (
     <div className="flex min-h-screen bg-surface">
       {/* Sidebar Placeholder */}
-      <aside className="w-64 border-r border-border bg-base flex flex-col hidden md:flex">
+      <aside className="w-64 border-r border-border bg-base hidden flex-col md:flex">
         <div className="h-14 flex items-center px-4 border-b border-border">
           <span className="font-display font-bold text-sm tracking-wide uppercase text-accent">V Portfolio</span>
         </div>
