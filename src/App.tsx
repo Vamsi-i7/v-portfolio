@@ -1,9 +1,12 @@
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { queryClient } from '@/lib/queryClient'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AdminLayout } from '@/components/layout/AdminLayout'
 import { Login } from '@/pages/admin/Login'
 import { Dashboard } from '@/pages/admin/Dashboard'
+import { Settings } from '@/pages/admin/Settings'
 
 // Public site placeholder
 function PublicPlaceholder() {
@@ -42,6 +45,10 @@ const router = createBrowserRouter([
             index: true,
             element: <Dashboard />,
           },
+          {
+            path: 'settings',
+            element: <Settings />,
+          },
           // Future admin routes will go here
         ],
       },
@@ -55,9 +62,11 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
 
