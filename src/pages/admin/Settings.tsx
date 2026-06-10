@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/incompatible-library */
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -51,6 +52,7 @@ export function Settings() {
     handleSubmit,
     reset,
     watch,
+    getValues,
     setValue,
     formState: { errors, isDirty },
   } = useForm<SettingsFormValues>({
@@ -231,7 +233,7 @@ export function Settings() {
                 <div className="flex gap-4 items-center">
                   <Input id="resume_path" {...register('resume_path')} placeholder="path/to/resume.pdf" className="flex-1" />
                   <Button variant="outline" type="button" onClick={() => {
-                    const path = watch('resume_path')
+                    const path = getValues('resume_path')
                     if (path) {
                        window.open(getPublicUrl('portfolio-assets', path), '_blank')
                     }
