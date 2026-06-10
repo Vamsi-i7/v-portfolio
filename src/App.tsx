@@ -7,7 +7,10 @@ import { AdminLayout } from '@/components/layout/AdminLayout'
 import { Login } from '@/pages/admin/Login'
 import { Dashboard } from '@/pages/admin/Dashboard'
 import { Settings } from '@/pages/admin/Settings'
-
+import { ProjectsList } from '@/pages/admin/Projects'
+import { ProjectForm } from '@/pages/admin/Projects/ProjectForm'
+import { ExperienceList } from '@/pages/admin/Experience'
+import { ExperienceForm } from '@/pages/admin/Experience/ExperienceForm'
 // Public site placeholder
 function PublicPlaceholder() {
   return (
@@ -49,7 +52,30 @@ const router = createBrowserRouter([
             path: 'settings',
             element: <Settings />,
           },
-          // Future admin routes will go here
+          {
+            path: 'projects',
+            element: <ProjectsList />,
+          },
+          {
+            path: 'projects/new',
+            element: <ProjectForm />,
+          },
+          {
+            path: 'projects/:id',
+            element: <ProjectForm />,
+          },
+          {
+            path: 'experience',
+            element: <ExperienceList />,
+          },
+          {
+            path: 'experience/new',
+            element: <ExperienceForm />,
+          },
+          {
+            path: 'experience/:id',
+            element: <ExperienceForm />,
+          },
         ],
       },
     ],
