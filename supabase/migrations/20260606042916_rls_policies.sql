@@ -18,10 +18,12 @@
 
 CREATE OR REPLACE FUNCTION is_admin()
 RETURNS boolean AS $$
-    SELECT EXISTS (
-        SELECT 1 FROM settings WHERE owner_user_id = auth.uid()
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM public.settings WHERE owner_user_id = auth.uid()
     );
-$$ LANGUAGE sql SECURITY DEFINER;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================
 -- 2. Enable RLS on ALL tables
@@ -49,7 +51,16 @@ CREATE POLICY "settings_public_read"
 
 CREATE POLICY "settings_admin_insert"
     ON settings FOR INSERT
-    WITH CHECK (is_admin());
+    WITH CHECK (
+        -- Allow if user is authenticated AND either:
+        -- 1. Table is empty (first user)
+        -- 2. User is already the owner (unlikely for insert)
+        auth.uid() IS NOT NULL AND (
+            NOT EXISTS (SELECT 1 FROM public.settings)
+            OR 
+            owner_user_id = auth.uid()
+        )
+    );
 
 CREATE POLICY "settings_admin_update"
     ON settings FOR UPDATE
