@@ -19,6 +19,7 @@ import { AchievementsList } from '@/pages/admin/Achievements'
 import { AchievementForm } from '@/pages/admin/Achievements/AchievementForm'
 import { CertificatesList } from '@/pages/admin/Certificates'
 import { CertificateForm } from '@/pages/admin/Certificates/CertificateForm'
+import { CodingProfilesPage } from '@/pages/admin/CodingProfiles'
 // Public site placeholder
 function PublicPlaceholder() {
   return (
@@ -131,6 +132,10 @@ const router = createBrowserRouter([
           {
             path: 'certificates/:id/edit',
             element: <CertificateForm />,
+          },
+          {
+            path: 'coding-profiles',
+            element: <CodingProfilesPage />,
           },
         ],
       },
