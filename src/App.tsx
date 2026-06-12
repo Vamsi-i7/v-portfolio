@@ -11,6 +11,8 @@ import { ProjectsList } from '@/pages/admin/Projects'
 import { ProjectForm } from '@/pages/admin/Projects/ProjectForm'
 import { ExperienceList } from '@/pages/admin/Experience'
 import { ExperienceForm } from '@/pages/admin/Experience/ExperienceForm'
+import { JourneyList } from '@/pages/admin/Journey'
+import { JourneyForm } from '@/pages/admin/Journey/JourneyForm'
 // Public site placeholder
 function PublicPlaceholder() {
   return (
@@ -75,6 +77,18 @@ const router = createBrowserRouter([
           {
             path: 'experience/:id',
             element: <ExperienceForm />,
+          },
+          {
+            path: 'journey',
+            element: <JourneyList />,
+          },
+          {
+            path: 'journey/new',
+            element: <JourneyForm />,
+          },
+          {
+            path: 'journey/:id/edit',
+            element: <JourneyForm />,
           },
         ],
       },
