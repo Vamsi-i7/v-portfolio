@@ -17,6 +17,8 @@ import { SkillsList } from '@/pages/admin/Skills'
 import { SkillForm } from '@/pages/admin/Skills/SkillForm'
 import { AchievementsList } from '@/pages/admin/Achievements'
 import { AchievementForm } from '@/pages/admin/Achievements/AchievementForm'
+import { CertificatesList } from '@/pages/admin/Certificates'
+import { CertificateForm } from '@/pages/admin/Certificates/CertificateForm'
 // Public site placeholder
 function PublicPlaceholder() {
   return (
@@ -117,6 +119,18 @@ const router = createBrowserRouter([
           {
             path: 'achievements/:id/edit',
             element: <AchievementForm />,
+          },
+          {
+            path: 'certificates',
+            element: <CertificatesList />,
+          },
+          {
+            path: 'certificates/new',
+            element: <CertificateForm />,
+          },
+          {
+            path: 'certificates/:id/edit',
+            element: <CertificateForm />,
           },
         ],
       },
