@@ -15,6 +15,8 @@ import { JourneyList } from '@/pages/admin/Journey'
 import { JourneyForm } from '@/pages/admin/Journey/JourneyForm'
 import { SkillsList } from '@/pages/admin/Skills'
 import { SkillForm } from '@/pages/admin/Skills/SkillForm'
+import { AchievementsList } from '@/pages/admin/Achievements'
+import { AchievementForm } from '@/pages/admin/Achievements/AchievementForm'
 // Public site placeholder
 function PublicPlaceholder() {
   return (
@@ -103,6 +105,18 @@ const router = createBrowserRouter([
           {
             path: 'skills/:id/edit',
             element: <SkillForm />,
+          },
+          {
+            path: 'achievements',
+            element: <AchievementsList />,
+          },
+          {
+            path: 'achievements/new',
+            element: <AchievementForm />,
+          },
+          {
+            path: 'achievements/:id/edit',
+            element: <AchievementForm />,
           },
         ],
       },
