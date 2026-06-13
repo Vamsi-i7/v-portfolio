@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -11,6 +11,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { useToast } from '@/hooks/use-toast'
+import { supabase } from '@/lib/supabase'
+import { useQueryClient } from '@tanstack/react-query'
 
 const profilesSchema = z.object({
   github: z.string().optional().nullable(),
@@ -32,6 +34,8 @@ export function CodingProfilesPage() {
   const { data: cacheData, isLoading: isLoadingCache } = useCodingCache()
   const { mutateAsync: saveSettings, isPending: isSaving } = useMutateSettings()
   const { toast } = useToast()
+  const queryClient = useQueryClient()
+  const [refreshingPlatform, setRefreshingPlatform] = useState<string | null>(null)
 
   const {
     register,
@@ -88,11 +92,38 @@ export function CodingProfilesPage() {
     }
   }
 
-  const handleRefresh = (platformLabel: string) => {
-    toast({
-      title: 'Manual Refresh Queued',
-      description: `Manual refresh for ${platformLabel} will be available in Wave 6 via Edge Functions.`,
-    })
+  const handleRefresh = async (platformId: string, platformLabel: string) => {
+    if (platformId !== 'github') {
+      toast({
+        title: 'Manual Refresh Queued',
+        description: `Manual refresh for ${platformLabel} will be available in Wave 6 via Edge Functions.`,
+      })
+      return
+    }
+
+    setRefreshingPlatform(platformId)
+    try {
+      const { data, error } = await supabase.functions.invoke('sync-github')
+      
+      if (error) throw error
+      if (data?.success === false) throw new Error(data.error)
+
+      toast({
+        title: 'GitHub Sync Successful',
+        description: 'Your coding profile data has been refreshed.',
+      })
+      
+      // Invalidate cache query to update the UI
+      queryClient.invalidateQueries({ queryKey: ['coding_cache'] })
+    } catch (error: unknown) {
+      toast({
+        variant: 'destructive',
+        title: 'Sync Failed',
+        description: error instanceof Error ? error.message : 'An unexpected error occurred during sync.',
+      })
+    } finally {
+      setRefreshingPlatform(null)
+    }
   }
 
   if (isLoadingSettings) {
@@ -173,10 +204,15 @@ export function CodingProfilesPage() {
                 <Button 
                   variant="outline" 
                   className="w-full gap-2"
-                  onClick={() => handleRefresh(platform.label)}
+                  disabled={refreshingPlatform === platform.id}
+                  onClick={() => handleRefresh(platform.id, platform.label)}
                 >
-                  <RefreshCw className="w-4 h-4" />
-                  Refresh Now
+                  {refreshingPlatform === platform.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4" />
+                  )}
+                  {refreshingPlatform === platform.id ? 'Syncing...' : 'Refresh Now'}
                 </Button>
               </div>
             </div>
