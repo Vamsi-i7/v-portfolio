@@ -99,12 +99,6 @@ async function queryLeetCode<T>(query: string, variables: Record<string, string>
   })
 
   if (!res.ok) {
-    const body = await res.text()
-    console.error('[DEBUG] LeetCode GraphQL error response:', {
-      status: res.status,
-      statusText: res.statusText,
-      body: body.substring(0, 500),
-    })
     throw new Error(`LeetCode GraphQL request failed: ${res.status} ${res.statusText}`)
   }
 
@@ -121,32 +115,27 @@ serve(async (req) => {
   }
 
   try {
-    console.log('[DEBUG] sync-leetcode started')
 
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
 
     // 1. Get LeetCode username from settings
-    console.log('[DEBUG] Fetching LeetCode username from settings...')
     const { data: settings, error: settingsError } = await supabase
       .from('settings')
       .select('social_links')
       .single()
 
     if (settingsError) {
-      console.error('[DEBUG] Settings Fetch Error:', settingsError)
       throw settingsError
     }
 
     const socialLinks = settings.social_links as Record<string, string> | null
     const leetcodeUsername = socialLinks?.leetcode
-    console.log('[DEBUG] settings.social_links.leetcode:', leetcodeUsername)
 
     if (!leetcodeUsername) {
       throw new Error('LeetCode username not configured in settings.')
     }
 
     // 2. Fetch User Profile + Solve Stats
-    console.log(`[DEBUG] Fetching LeetCode profile for "${leetcodeUsername}"...`)
     const profileRes = await queryLeetCode<LCProfileResponse>(
       USER_PROFILE_QUERY,
       { username: leetcodeUsername }
@@ -157,21 +146,13 @@ serve(async (req) => {
       throw new Error(`LeetCode user "${leetcodeUsername}" not found. Verify the username is correct.`)
     }
 
-    console.log('[DEBUG] Profile fetched successfully:', {
-      username: matchedUser.username,
-      ranking: matchedUser.profile.ranking,
-      solveStats: matchedUser.submitStatsGlobal.acSubmissionNum,
-    })
-
     // 3. Fetch Contest Ranking (may be null if user has never competed)
-    console.log(`[DEBUG] Fetching LeetCode contest info for "${leetcodeUsername}"...`)
     const contestRes = await queryLeetCode<LCContestResponse>(
       USER_CONTEST_QUERY,
       { username: leetcodeUsername }
     )
 
     const contestRanking = contestRes.data?.userContestRanking
-    console.log('[DEBUG] Contest data:', contestRanking ?? 'No contest history (null)')
 
     // 4. Parse solve stats
     const solveStats = matchedUser.submitStatsGlobal.acSubmissionNum
@@ -184,7 +165,6 @@ serve(async (req) => {
     const mediumSolved = getSolveCount('Medium')
     const hardSolved = getSolveCount('Hard')
 
-    console.log('[DEBUG] Solve breakdown:', { totalSolved, easySolved, mediumSolved, hardSolved })
 
     // 5. Construct Payload
     const payload = {
@@ -215,10 +195,8 @@ serve(async (req) => {
       },
     }
 
-    console.log('[DEBUG] Final payload constructed:', JSON.stringify(payload, null, 2))
 
     // 6. Upsert into coding_cache
-    console.log('[DEBUG] Upserting into coding_cache...')
     const { error: upsertError } = await supabase
       .from('coding_cache')
       .upsert({
@@ -230,17 +208,14 @@ serve(async (req) => {
       }, { onConflict: 'platform, cache_key' })
 
     if (upsertError) {
-      console.error('[DEBUG] Cache Upsert Error:', upsertError)
       throw upsertError
     }
 
-    console.log('[DEBUG] sync-leetcode completed successfully')
     return new Response(JSON.stringify({ success: true, data: payload }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
   } catch (error) {
-    console.error('[DEBUG] sync-leetcode FAILED:', error)
     const message = error instanceof Error ? error.message : 'An unexpected error occurred'
     return new Response(JSON.stringify({ success: false, error: message }), {
       status: 400,

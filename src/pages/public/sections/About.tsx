@@ -75,7 +75,7 @@ export function About() {
           {settings?.resume_path && (
             <div className="pt-4">
               <Button asChild variant="outline" className="btn-ghost">
-                <a href={settings.resume_path} target="_blank" rel="noopener noreferrer">
+                <a href={getPublicUrl('portfolio-assets', settings.resume_path)} target="_blank" rel="noopener noreferrer">
                   <FileText className="w-4 h-4 mr-2" />
                   View Resume
                 </a>

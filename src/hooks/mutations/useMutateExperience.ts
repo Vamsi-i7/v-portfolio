@@ -11,12 +11,9 @@ export function useMutateExperience() {
 
   return useMutation({
     mutationFn: async (values: ExperienceInsert | (ExperienceUpdate & { id: string })) => {
-      console.log('[DEBUG] useMutateExperience execution started');
-      console.log('[DEBUG] Input values:', JSON.stringify(values, null, 2));
 
       if ('id' in values && values.id) {
         // Update
-        console.log('[DEBUG] Performing UPDATE for ID:', values.id);
         const { data, error } = await supabase
           .from('experience')
           .update(values as ExperienceUpdate)
@@ -25,14 +22,11 @@ export function useMutateExperience() {
           .single()
         
         if (error) {
-          console.error('[DEBUG] Supabase UPDATE Error:', error);
           throw error;
         }
-        console.log('[DEBUG] Supabase UPDATE Success:', data);
         return data
       } else {
         // Insert
-        console.log('[DEBUG] Performing INSERT');
         const { data, error } = await supabase
           .from('experience')
           .insert(values as ExperienceInsert)
@@ -40,16 +34,8 @@ export function useMutateExperience() {
           .single()
         
         if (error) {
-          console.error('[DEBUG] Supabase INSERT Error:', error);
-          console.error('[DEBUG] Error Details:', {
-            code: error.code,
-            message: error.message,
-            details: error.details,
-            hint: error.hint
-          });
           throw error;
         }
-        console.log('[DEBUG] Supabase INSERT Success:', data);
         return data
       }
     },
