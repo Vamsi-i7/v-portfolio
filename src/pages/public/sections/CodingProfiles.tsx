@@ -92,9 +92,9 @@ export function CodingProfiles() {
   if (isLoading || (!githubData && !cfData && !lcData)) return null
 
   return (
-    <AnimatedSection id="engineering-footprint" className="section-container py-24">
+    <AnimatedSection id="engineering-footprint" className="section-container py-24" aria-labelledby="footprint-title">
       <div className="flex flex-col gap-4 mb-12">
-        <h2 className="section-title">Engineering Footprint</h2>
+        <h2 id="footprint-title" className="section-title">Engineering Footprint</h2>
         <p className="section-subtitle">
           A real-time snapshot of my open-source impact and competitive programming status.
         </p>

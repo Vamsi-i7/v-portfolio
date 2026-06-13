@@ -30,10 +30,10 @@ export function Experience() {
   }
 
   return (
-    <AnimatedSection id="experience" className="section-container py-16 md:py-24 relative">
+    <AnimatedSection id="experience" className="section-container py-16 md:py-24 relative" aria-labelledby="experience-title">
       <div className="mb-10 md:mb-12">
         <span className="section-label mb-2">Career</span>
-        <h2 className="text-section font-display font-bold tracking-tight">
+        <h2 id="experience-title" className="text-section font-display font-bold tracking-tight">
           Professional Experience
         </h2>
       </div>

@@ -16,7 +16,7 @@ export function Now() {
   }
 
   return (
-    <AnimatedSection id="now" className="section-container py-16 md:py-24">
+    <AnimatedSection id="now" className="section-container py-16 md:py-24" aria-label="Current Status">
       <div className="glass-card rounded-2xl p-6 md:p-8 max-w-3xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-6 border-l-4 border-l-accent">
         
         <div className="flex-shrink-0 pt-1">

@@ -7,17 +7,21 @@ interface AnimatedSectionProps {
   className?: string
   /** Adjust margin to trigger animation earlier/later. Default: "-100px" */
   viewportMargin?: string
+  /** Accessible name for the section */
+  'aria-labelledby'?: string
 }
 
 export function AnimatedSection({ 
   id, 
   children, 
   className = '', 
-  viewportMargin = '-100px' 
+  viewportMargin = '-100px',
+  'aria-labelledby': ariaLabelledBy
 }: AnimatedSectionProps) {
   return (
     <motion.section
       id={id}
+      aria-labelledby={ariaLabelledBy}
       className={`section-padding ${className}`}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}

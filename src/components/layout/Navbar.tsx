@@ -15,19 +15,20 @@ export function Navbar() {
   const siteTitle = settings?.site_title || 'V Portfolio'
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 glass-card border-b border-border/40 hidden md:flex items-center">
+    <header role="banner" className="fixed top-0 left-0 right-0 z-50 h-16 glass-card border-b border-border/40 hidden md:flex items-center">
       <div className="container mx-auto px-6 h-full flex items-center justify-between">
         
         {/* Logo / Brand */}
         <a 
           href="#home" 
           className="font-display font-bold text-lg tracking-tight text-primary transition-colors hover:text-accent-foreground"
+          aria-label="V Portfolio Home"
         >
           {siteTitle}
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="flex items-center gap-8">
+        <nav aria-label="Desktop Navigation" className="flex items-center gap-8">
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}

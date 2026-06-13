@@ -63,10 +63,10 @@ export function Contact() {
   }
 
   return (
-    <AnimatedSection id="contact" className="section-container py-16 md:py-24">
+    <AnimatedSection id="contact" className="section-container py-16 md:py-24" aria-labelledby="contact-title">
       <div className="mb-10 md:mb-16 max-w-2xl mx-auto text-center">
         <span className="section-label mb-2 justify-center">Get In Touch</span>
-        <h2 className="text-section font-display font-bold tracking-tight mb-4">
+        <h2 id="contact-title" className="text-section font-display font-bold tracking-tight mb-4">
           Let's Build Something Together
         </h2>
         <p className="text-muted-foreground text-lg">
@@ -109,8 +109,8 @@ export function Contact() {
         {/* Contact Form */}
         <div className="card-elevated">
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Honeypot field - hidden from users */}
-            <div className="hidden">
+            {/* Honeypot field - hidden from users and screen readers */}
+            <div className="hidden" aria-hidden="true">
               <input 
                 id="website" 
                 type="text" 

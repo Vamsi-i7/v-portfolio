@@ -1,3 +1,5 @@
+import { SEO } from '@/components/layout/SEO'
+import { JsonLd } from '@/components/layout/JsonLd'
 import { Hero } from './sections/Hero'
 import { About } from './sections/About'
 import { Now } from './sections/Now'
@@ -13,6 +15,8 @@ import { Contact } from './sections/Contact'
 export function Home() {
   return (
     <>
+      <SEO />
+      <JsonLd />
       <Hero />
       <Now />
       <Experience />

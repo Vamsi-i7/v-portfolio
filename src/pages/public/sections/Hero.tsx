@@ -8,7 +8,7 @@ export function Hero() {
   const { data: settings, isLoading } = useSettings()
 
   return (
-    <AnimatedSection id="home" className="relative min-h-[90vh] flex flex-col justify-center">
+    <AnimatedSection id="home" className="relative min-h-[90vh] flex flex-col justify-center" aria-labelledby="hero-title">
       {/* Background Gradient Effect - Matches PRD §5.5/§7.1 */}
       <div 
         className="absolute inset-0 pointer-events-none -z-10"
@@ -25,7 +25,7 @@ export function Hero() {
         </div>
 
         {/* Main Tagline */}
-        <h1 className="text-hero font-display font-extrabold leading-[1.1] tracking-tight mb-8">
+        <h1 id="hero-title" className="text-hero font-display font-extrabold leading-[1.1] tracking-tight mb-8">
           {isLoading ? (
             <div className="animate-pulse bg-muted h-20 w-3/4 mx-auto rounded-md" />
           ) : (

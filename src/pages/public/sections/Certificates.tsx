@@ -9,10 +9,10 @@ export function Certificates() {
   if (isLoading || !certificates?.length) return null
 
   return (
-    <AnimatedSection id="certificates" className="section-container">
+    <AnimatedSection id="certificates" className="section-container" aria-labelledby="certificates-title">
       <div className="mb-10 md:mb-16">
         <span className="section-label mb-2">Verified Proof</span>
-        <h2 className="text-section font-display font-bold tracking-tight mb-4">
+        <h2 id="certificates-title" className="text-section font-display font-bold tracking-tight mb-4">
           Licenses & Certifications
         </h2>
         <p className="text-muted-foreground text-lg max-w-2xl">

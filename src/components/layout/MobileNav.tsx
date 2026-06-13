@@ -10,7 +10,11 @@ const MOBILE_NAV_LINKS = [
 
 export function MobileNav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-border/40 md:hidden pb-safe">
+    <nav 
+      role="navigation" 
+      aria-label="Mobile Navigation" 
+      className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-border/40 md:hidden pb-safe"
+    >
       <div className="flex items-center justify-around px-2 py-3">
         {MOBILE_NAV_LINKS.map((link) => {
           const Icon = link.icon
@@ -18,7 +22,7 @@ export function MobileNav() {
             <a
               key={link.href}
               href={link.href}
-              className="flex flex-col items-center justify-center w-16 gap-1 text-muted-foreground transition-colors hover:text-primary active:scale-95"
+              className="flex flex-col items-center justify-center w-16 gap-1 text-muted-foreground transition-colors hover:text-primary active:scale-95 focus-visible:text-primary"
             >
               <Icon className="w-5 h-5" strokeWidth={2} />
               <span className="text-[10px] font-medium tracking-wide">{link.label}</span>
