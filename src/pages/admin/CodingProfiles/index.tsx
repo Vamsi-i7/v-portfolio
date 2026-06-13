@@ -93,7 +93,7 @@ export function CodingProfilesPage() {
   }
 
   const handleRefresh = async (platformId: string, platformLabel: string) => {
-    if (platformId !== 'github') {
+    if (platformId !== 'github' && platformId !== 'codeforces') {
       toast({
         title: 'Manual Refresh Queued',
         description: `Manual refresh for ${platformLabel} will be available in Wave 6 via Edge Functions.`,
@@ -103,13 +103,14 @@ export function CodingProfilesPage() {
 
     setRefreshingPlatform(platformId)
     try {
-      const { data, error } = await supabase.functions.invoke('sync-github')
+      const functionName = `sync-${platformId}`
+      const { data, error } = await supabase.functions.invoke(functionName)
       
       if (error) throw error
       if (data?.success === false) throw new Error(data.error)
 
       toast({
-        title: 'GitHub Sync Successful',
+        title: `${platformLabel} Sync Successful`,
         description: 'Your coding profile data has been refreshed.',
       })
       

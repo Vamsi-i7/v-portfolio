@@ -1,6 +1,6 @@
 import { useCodingCache } from '@/hooks/queries/useCodingCache'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
-import { GitBranch, Star, Book, Users, Calendar, Activity } from 'lucide-react'
+import { GitBranch, Star, Book, Users, Calendar, Activity, Trophy, TrendingUp, Hash } from 'lucide-react'
 
 interface GitHubData {
   profile: {
@@ -32,171 +32,305 @@ interface GitHubData {
   };
 }
 
+interface CodeforcesData {
+  profile: {
+    handle: string;
+    avatar: string;
+    rank: string;
+    max_rank: string;
+  };
+  stats: {
+    rating: number;
+    max_rating: number;
+    contest_count: number;
+  };
+  activity: {
+    last_contest_name: string;
+    last_rating_change: number;
+    last_contest_date: string;
+  };
+  metadata: {
+    last_synced_at: string;
+  };
+}
+
 export function CodingProfiles() {
   const { data: cacheEntries, isLoading } = useCodingCache()
 
   const githubEntry = cacheEntries?.find(entry => entry.platform === 'github')
   const githubData = githubEntry?.data as unknown as GitHubData
 
-  if (isLoading || !githubData) return null
+  const cfEntry = cacheEntries?.find(entry => entry.platform === 'codeforces')
+  const cfData = cfEntry?.data as unknown as CodeforcesData
 
-  const { profile, stats, languages, metadata, activity } = githubData
+  if (isLoading || (!githubData && !cfData)) return null
 
   return (
     <AnimatedSection id="engineering-footprint" className="section-container py-24">
       <div className="flex flex-col gap-4 mb-12">
         <h2 className="section-title">Engineering Footprint</h2>
         <p className="section-subtitle">
-          A real-time snapshot of my open-source impact and developer activity.
+          A real-time snapshot of my open-source impact and competitive programming status.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Profile & Stats Bento Card */}
-        <div className="lg:col-span-2 glass-card rounded-2xl p-8 relative overflow-hidden group border-l-4 border-l-emerald-500/50">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <GitBranch className="w-24 h-24" />
-          </div>
+      <div className="flex flex-col gap-12">
+        {githubData && <GitHubCard data={githubData} />}
+        {cfData && <CodeforcesCard data={cfData} />}
+      </div>
+    </AnimatedSection>
+  )
+}
 
-          <div className="flex flex-col md:flex-row gap-8 items-start md:items-center mb-8">
-            <div className="relative">
-              <img 
-                src={profile.avatar_url} 
-                alt={profile.username} 
-                className="w-20 h-20 rounded-xl border-2 border-emerald-500/20 shadow-lg"
-              />
-              <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1 rounded-md shadow-lg">
-                <GitBranch className="w-4 h-4" />
-              </div>
-            </div>
+function GitHubCard({ data }: { data: GitHubData }) {
+  const { profile, stats, languages, metadata, activity } = data
 
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <h3 className="text-2xl font-display font-bold">github.com/{profile.username}</h3>
-                <span className="bg-emerald-500/10 text-emerald-500 text-xs font-medium px-2.5 py-0.5 rounded-full border border-emerald-500/20">
-                  Active {profile.years_active}+ Years
-                </span>
-              </div>
-              <p className="text-muted-foreground flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Member since {new Date(profile.member_since).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="p-4 rounded-xl bg-surface/50 border border-border/50">
-              <div className="flex items-center gap-2 text-muted-foreground mb-1 text-sm">
-                <Star className="w-4 h-4" />
-                <span>Stars</span>
-              </div>
-              <span className="text-2xl font-display font-bold">{stats.total_stars}</span>
-            </div>
-            
-            <div className="p-4 rounded-xl bg-surface/50 border border-border/50">
-              <div className="flex items-center gap-2 text-muted-foreground mb-1 text-sm">
-                <Book className="w-4 h-4" />
-                <span>Repos</span>
-              </div>
-              <span className="text-2xl font-display font-bold">{stats.total_repos}</span>
-            </div>
-
-            <div className="p-4 rounded-xl bg-surface/50 border border-border/50">
-              <div className="flex items-center gap-2 text-muted-foreground mb-1 text-sm">
-                <Activity className="w-4 h-4" />
-                <span>Impact</span>
-              </div>
-              <span className="text-2xl font-display font-bold">{stats.contributions_last_year || '500+'}</span>
-            </div>
-
-            <div className="p-4 rounded-xl bg-surface/50 border border-border/50">
-              <div className="flex items-center gap-2 text-muted-foreground mb-1 text-sm">
-                <Users className="w-4 h-4" />
-                <span>Followers</span>
-              </div>
-              <span className="text-2xl font-display font-bold">{stats.followers}</span>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex justify-between items-center text-sm">
-              <span className="font-medium">Top Technologies</span>
-              <span className="text-muted-foreground text-xs">Based on public repos</span>
-            </div>
-            <div className="h-3 w-full bg-surface rounded-full overflow-hidden flex border border-border/50">
-              {languages.map((lang, i) => (
-                <div 
-                  key={lang.name}
-                  className="h-full transition-all hover:scale-y-110"
-                  style={{ 
-                    width: `${lang.percent}%`, 
-                    backgroundColor: lang.color,
-                    opacity: 1 - (i * 0.1)
-                  }}
-                  title={`${lang.name}: ${lang.percent}%`}
-                />
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-x-4 gap-y-2">
-              {languages.map((lang) => (
-                <div key={lang.name} className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: lang.color }} />
-                  <span className="text-xs text-muted-foreground">{lang.name} ({lang.percent}%)</span>
-                </div>
-              ))}
-            </div>
-          </div>
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Main Profile & Stats Bento Card */}
+      <div className="lg:col-span-2 glass-card rounded-2xl p-8 relative overflow-hidden group border-l-4 border-l-emerald-500/50">
+        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <GitBranch className="w-24 h-24" />
         </div>
 
-        {/* Activity Snippet Bento Card */}
-        <div className="glass-card rounded-2xl p-8 flex flex-col justify-between border-t-4 border-t-emerald-500/50">
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-display font-bold text-xl">Recent Activity</h3>
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            </div>
-            
-            <div className="space-y-6">
-              <div className="relative pl-6 border-l border-border/50 py-1">
-                <div className="absolute top-0 -left-1.5 w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500/50" />
-                <p className="text-sm font-medium mb-1">
-                  {activity.latest_interaction.type} in {activity.latest_interaction.repo_name}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(activity.latest_interaction.occurred_at).toLocaleDateString(undefined, { 
-                    month: 'short', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </p>
-              </div>
-
-              <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                <p className="text-xs text-emerald-500 font-medium mb-2 uppercase tracking-wider">Engineering Persona</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  Focusing on <strong>{languages[0]?.name}</strong> and building scalable <strong>{languages[1]?.name || 'Web'}</strong> solutions.
-                </p>
-              </div>
+        <div className="flex flex-col md:flex-row gap-8 items-start md:items-center mb-8">
+          <div className="relative">
+            <img 
+              src={profile.avatar_url} 
+              alt={profile.username} 
+              className="w-20 h-20 rounded-xl border-2 border-emerald-500/20 shadow-lg"
+            />
+            <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1 rounded-md shadow-lg">
+              <GitBranch className="w-4 h-4" />
             </div>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-border/50 text-center">
-            <a 
-              href={`https://github.com/${profile.username}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-emerald-500 hover:text-emerald-400 transition-colors font-medium inline-flex items-center gap-2"
-            >
-              View Full Footprint
-              <GitBranch className="w-4 h-4" />
-            </a>
-            <p className="text-[10px] text-muted-foreground mt-4 font-mono">
-              LAST SYNCED: {new Date(metadata.last_synced_at).toLocaleString()}
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <h3 className="text-2xl font-display font-bold">github.com/{profile.username}</h3>
+              <span className="bg-emerald-500/10 text-emerald-500 text-xs font-medium px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                Active {profile.years_active}+ Years
+              </span>
+            </div>
+            <p className="text-muted-foreground flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Member since {new Date(profile.member_since).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
             </p>
           </div>
         </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <StatCell label="Stars" value={stats.total_stars} icon={<Star className="w-4 h-4" />} />
+          <StatCell label="Repos" value={stats.total_repos} icon={<Book className="w-4 h-4" />} />
+          <StatCell label="Impact" value={stats.contributions_last_year || '500+'} icon={<Activity className="w-4 h-4" />} />
+          <StatCell label="Followers" value={stats.followers} icon={<Users className="w-4 h-4" />} />
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex justify-between items-center text-sm">
+            <span className="font-medium">Top Technologies</span>
+            <span className="text-muted-foreground text-xs">Based on public repos</span>
+          </div>
+          <div className="h-3 w-full bg-surface rounded-full overflow-hidden flex border border-border/50">
+            {languages.map((lang, i) => (
+              <div 
+                key={lang.name}
+                className="h-full transition-all hover:scale-y-110"
+                style={{ 
+                  width: `${lang.percent}%`, 
+                  backgroundColor: lang.color,
+                  opacity: 1 - (i * 0.1)
+                }}
+                title={`${lang.name}: ${lang.percent}%`}
+              />
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {languages.map((lang) => (
+              <div key={lang.name} className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: lang.color }} />
+                <span className="text-xs text-muted-foreground">{lang.name} ({lang.percent}%)</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </AnimatedSection>
+
+      {/* Activity Snippet Bento Card */}
+      <div className="glass-card rounded-2xl p-8 flex flex-col justify-between border-t-4 border-t-emerald-500/50">
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-display font-bold text-xl">Recent Activity</h3>
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          </div>
+          
+          <div className="space-y-6">
+            <div className="relative pl-6 border-l border-border/50 py-1">
+              <div className="absolute top-0 -left-1.5 w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500/50" />
+              <p className="text-sm font-medium mb-1">
+                {activity.latest_interaction.type} in {activity.latest_interaction.repo_name}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {new Date(activity.latest_interaction.occurred_at).toLocaleDateString(undefined, { 
+                  month: 'short', 
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+              <p className="text-xs text-emerald-500 font-medium mb-2 uppercase tracking-wider">Engineering Persona</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Focusing on <strong>{languages[0]?.name}</strong> and building scalable <strong>{languages[1]?.name || 'Web'}</strong> solutions.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-border/50 text-center">
+          <a 
+            href={`https://github.com/${profile.username}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-emerald-500 hover:text-emerald-400 transition-colors font-medium inline-flex items-center gap-2"
+          >
+            View Full Footprint
+            <GitBranch className="w-4 h-4" />
+          </a>
+          <p className="text-[10px] text-muted-foreground mt-4 font-mono uppercase">
+            Last Synced: {new Date(metadata.last_synced_at).toLocaleString()}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CodeforcesCard({ data }: { data: CodeforcesData }) {
+  const { profile, stats, activity, metadata } = data
+
+  // Codeforces color mapping
+  const getRankColor = (rank: string) => {
+    const r = rank.toLowerCase()
+    if (r.includes('legendary') || r.includes('international grandmaster') || r.includes('grandmaster')) return 'text-[#ff0000]'
+    if (r.includes('international master') || r.includes('master')) return 'text-[#ff8c00]'
+    if (r.includes('candidate master')) return 'text-[#aa00aa]'
+    if (r.includes('expert')) return 'text-[#0000ff]'
+    if (r.includes('specialist')) return 'text-[#03a89e]'
+    if (r.includes('pupil')) return 'text-[#008000]'
+    if (r.includes('newbie')) return 'text-[#808080]'
+    return 'text-muted-foreground'
+  }
+
+  const rankColorClass = getRankColor(profile.rank)
+  const accentColor = rankColorClass.match(/\[(.*?)\]/)?.[1] || '#3b82f6'
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2 glass-card rounded-2xl p-8 relative overflow-hidden group border-l-4" style={{ borderLeftColor: accentColor }}>
+        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <Trophy className="w-24 h-24" />
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-8 items-start md:items-center mb-8">
+          <div className="relative">
+            <img 
+              src={profile.avatar} 
+              alt={profile.handle} 
+              className="w-20 h-20 rounded-xl border-2 border-border shadow-lg"
+            />
+            <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white p-1 rounded-md shadow-lg">
+              <Trophy className="w-4 h-4" />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <h3 className="text-2xl font-display font-bold">codeforces.com/profile/{profile.handle}</h3>
+              <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full border bg-surface/50 ${rankColorClass}`}>
+                {profile.rank.toUpperCase()}
+              </span>
+            </div>
+            <p className="text-muted-foreground flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Peak Rating: <span className="font-bold text-foreground">{stats.max_rating}</span> ({profile.max_rank})
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCell label="Current Rating" value={stats.rating} icon={<Trophy className="w-4 h-4" />} />
+          <StatCell label="Max Rating" value={stats.max_rating} icon={<Star className="w-4 h-4" />} />
+          <StatCell label="Contests" value={stats.contest_count} icon={<Hash className="w-4 h-4" />} />
+          <StatCell 
+            label="Last Change" 
+            value={(activity.last_rating_change >= 0 ? '+' : '') + activity.last_rating_change} 
+            icon={<Activity className="w-4 h-4" />} 
+            valueClass={activity.last_rating_change >= 0 ? 'text-success' : 'text-destructive'}
+          />
+        </div>
+      </div>
+
+      <div className="glass-card rounded-2xl p-8 flex flex-col justify-between border-t-4" style={{ borderTopColor: accentColor }}>
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-display font-bold text-xl">Latest Contest</h3>
+            <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+          </div>
+          
+          <div className="space-y-6">
+            <div className="relative pl-6 border-l border-border/50 py-1">
+              <div className="absolute top-0 -left-1.5 w-3 h-3 rounded-full bg-blue-500/20 border border-blue-500/50" />
+              <p className="text-sm font-medium mb-1 line-clamp-2">
+                {activity.last_contest_name}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {new Date(activity.last_contest_date).toLocaleDateString(undefined, { 
+                  month: 'short', 
+                  day: 'numeric',
+                  year: 'numeric'
+                })}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-blue-500/5 border border-blue-500/10">
+              <p className="text-xs text-blue-500 font-medium mb-2 uppercase tracking-wider">Performance Signal</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Currently competing as an <strong>{profile.rank}</strong>. Max career level reached was <strong>{profile.max_rank}</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-border/50 text-center">
+          <a 
+            href={`https://codeforces.com/profile/${profile.handle}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-blue-500 hover:text-blue-400 transition-colors font-medium inline-flex items-center gap-2"
+          >
+            View Codeforces Profile
+            <Trophy className="w-4 h-4" />
+          </a>
+          <p className="text-[10px] text-muted-foreground mt-4 font-mono uppercase">
+            Last Synced: {new Date(metadata.last_synced_at).toLocaleString()}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function StatCell({ label, value, icon, valueClass }: { label: string, value: string | number, icon: React.ReactNode, valueClass?: string }) {
+  return (
+    <div className="p-4 rounded-xl bg-surface/50 border border-border/50">
+      <div className="flex items-center gap-2 text-muted-foreground mb-1 text-sm">
+        {icon}
+        <span>{label}</span>
+      </div>
+      <span className={`text-2xl font-display font-bold ${valueClass || ''}`}>{value}</span>
+    </div>
   )
 }
