@@ -62,11 +62,11 @@ export function Skills() {
   }, {} as Record<string, typeof skills>)
 
   return (
-    <AnimatedSection id="skills" className="section-container py-16 md:py-24 relative">
+    <AnimatedSection id="skills" className="section-container py-16 md:py-24 relative" aria-labelledby="skills-title">
       {/* Section Header */}
       <div className="mb-10 md:mb-12">
         <span className="section-label mb-2">Technical Arsenal</span>
-        <h2 className="text-section font-display font-bold tracking-tight">
+        <h2 id="skills-title" className="text-section font-display font-bold tracking-tight">
           Skills & Technologies
         </h2>
       </div>

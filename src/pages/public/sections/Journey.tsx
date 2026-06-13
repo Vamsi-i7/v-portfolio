@@ -29,10 +29,10 @@ export function Journey() {
   }
 
   return (
-    <AnimatedSection id="journey" className="section-container py-16 md:py-24 relative">
+    <AnimatedSection id="journey" className="section-container py-16 md:py-24 relative" aria-labelledby="journey-title">
       <div className="mb-12 text-center md:text-left">
         <span className="section-label mb-2 mx-auto md:mx-0">My Path</span>
-        <h2 className="text-section font-display font-bold tracking-tight">
+        <h2 id="journey-title" className="text-section font-display font-bold tracking-tight">
           The Journey
         </h2>
       </div>
@@ -54,7 +54,7 @@ export function Journey() {
                 <div className={`pl-12 md:pl-0 w-full md:w-[45%] flex flex-col ${isEven ? 'md:items-end md:text-right' : 'md:items-start'}`}>
                   {isEven ? (
                     // Content for Even (Left Side)
-                    <div className="card-elevated w-full hover:border-accent/30 transition-colors min-h-[120px]">
+                    <div id={`journey-card-${index}`} className="card-elevated w-full hover:border-accent/30 transition-colors min-h-[120px]">
                       <div className="flex flex-col gap-2 mb-3">
                         <h3 className={`text-xl font-display font-bold ${entry.is_highlight ? 'text-accent' : ''}`}>
                           {entry.title}
@@ -104,7 +104,7 @@ export function Journey() {
                 <div className={`pl-12 md:pl-0 w-full md:w-[45%] flex flex-col ${isEven ? 'md:items-start hidden md:flex' : 'md:items-start mt-0'}`}>
                    {!isEven ? (
                     // Content for Odd (Right Side)
-                    <div className="card-elevated w-full hover:border-accent/30 transition-colors min-h-[120px] mt-0 md:mt-0">
+                    <div id={`journey-card-${index}`} className="card-elevated w-full hover:border-accent/30 transition-colors min-h-[120px] mt-0 md:mt-0">
                        <div className="flex flex-col gap-2 mb-3">
                         <h3 className={`text-xl font-display font-bold ${entry.is_highlight ? 'text-accent' : ''}`}>
                           {entry.title}

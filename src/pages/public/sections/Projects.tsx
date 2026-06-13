@@ -27,10 +27,10 @@ export function Projects() {
   }
 
   return (
-    <AnimatedSection id="projects" className="section-container py-16 md:py-24 relative">
+    <AnimatedSection id="projects" className="section-container py-16 md:py-24 relative" aria-labelledby="projects-title">
       <div className="mb-10 md:mb-12">
         <span className="section-label mb-2">Portfolio</span>
-        <h2 className="text-section font-display font-bold tracking-tight">
+        <h2 id="projects-title" className="text-section font-display font-bold tracking-tight">
           Featured Projects
         </h2>
       </div>

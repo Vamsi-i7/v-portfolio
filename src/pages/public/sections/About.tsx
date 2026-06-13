@@ -24,7 +24,7 @@ export function About() {
   }
 
   return (
-    <AnimatedSection id="about" className="section-container py-16 md:py-24">
+    <AnimatedSection id="about" className="section-container py-16 md:py-24" aria-labelledby="about-title">
       <div className="flex flex-col md:flex-row gap-12 items-center md:items-start">
         
         {/* Profile Image Column */}
@@ -53,7 +53,7 @@ export function About() {
         <div className="flex-1 space-y-6">
           <div>
             <span className="section-label mb-2">About Me</span>
-            <h2 className="text-section font-display font-bold tracking-tight">
+            <h2 id="about-title" className="text-section font-display font-bold tracking-tight">
               Behind the Code
             </h2>
           </div>
