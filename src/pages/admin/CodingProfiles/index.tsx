@@ -93,7 +93,7 @@ export function CodingProfilesPage() {
   }
 
   const handleRefresh = async (platformId: string, platformLabel: string) => {
-    if (platformId !== 'github' && platformId !== 'codeforces') {
+    if (platformId !== 'github' && platformId !== 'codeforces' && platformId !== 'leetcode') {
       toast({
         title: 'Manual Refresh Queued',
         description: `Manual refresh for ${platformLabel} will be available in Wave 6 via Edge Functions.`,
