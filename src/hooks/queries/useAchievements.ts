@@ -10,8 +10,8 @@ export function useAchievements() {
       const { data, error } = await supabase
         .from('achievements')
         .select('*')
+        .eq('status', 'published')
         .order('achieved_at', { ascending: false })
-        .order('created_at', { ascending: false })
 
       if (error) throw error
       return data

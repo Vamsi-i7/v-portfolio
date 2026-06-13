@@ -2,10 +2,11 @@ import { useSettings } from '@/hooks/queries/useSettings'
 import { Button } from '@/components/ui/button'
 
 const NAV_LINKS = [
-  { href: '#about', label: 'About' },
-  { href: '#skills', label: 'Skills' },
+  { href: '#experience', label: 'Experience' },
   { href: '#projects', label: 'Projects' },
+  { href: '#skills', label: 'Skills' },
   { href: '#journey', label: 'Journey' },
+  { href: '#about', label: 'About' },
 ]
 
 export function Navbar() {
@@ -37,7 +38,7 @@ export function Navbar() {
             </a>
           ))}
           
-          <Button asChild variant="default" className="btn-accent ml-4">
+          <Button asChild variant="default" className="btn-accent ml-4 h-10 px-5">
             <a href="#contact">Let's Talk</a>
           </Button>
         </nav>

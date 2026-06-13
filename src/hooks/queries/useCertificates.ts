@@ -10,8 +10,9 @@ export function useCertificates() {
       const { data, error } = await supabase
         .from('certificates')
         .select('*')
+        .eq('status', 'published')
+        .order('is_featured', { ascending: false })
         .order('issued_at', { ascending: false })
-        .order('created_at', { ascending: false })
 
       if (error) throw error
       return data

@@ -1,6 +1,7 @@
 import { useSettings } from '@/hooks/queries/useSettings'
 import { useExperiences } from '@/hooks/queries/useExperiences'
 import { MapPin, Briefcase } from 'lucide-react'
+import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
 
 export function Now() {
   const { data: settings } = useSettings()
@@ -15,7 +16,7 @@ export function Now() {
   }
 
   return (
-    <div className="section-container pb-16">
+    <AnimatedSection id="now" className="section-container py-16 md:py-24">
       <div className="glass-card rounded-2xl p-6 md:p-8 max-w-3xl mx-auto flex flex-col md:flex-row items-center md:items-start gap-6 border-l-4 border-l-accent">
         
         <div className="flex-shrink-0 pt-1">
@@ -56,6 +57,6 @@ export function Now() {
 
         </div>
       </div>
-    </div>
+    </AnimatedSection>
   )
 }

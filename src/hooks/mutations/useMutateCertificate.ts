@@ -12,10 +12,11 @@ export function useMutateCertificate() {
   return useMutation({
     mutationFn: async (values: CertificateInsert | (CertificateUpdate & { id: string })) => {
       if ('id' in values && values.id) {
+        const { id, ...updateData } = values as CertificateUpdate & { id: string }
         const { data, error } = await supabase
           .from('certificates')
-          .update(values as CertificateUpdate)
-          .eq('id', values.id)
+          .update(updateData)
+          .eq('id', id)
           .select()
           .single()
         
