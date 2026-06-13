@@ -1,10 +1,66 @@
+import { useState } from 'react'
 import { useSettings } from '@/hooks/queries/useSettings'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
 import { Button } from '@/components/ui/button'
-import { Mail, MapPin, Send } from 'lucide-react'
+import { Mail, MapPin, Send, Loader2 } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import { useToast } from '@/hooks/use-toast'
 
 export function Contact() {
   const { data: settings } = useSettings()
+  const { toast } = useToast()
+  
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: '',
+    website: '', // Honeypot
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+
+    try {
+      const { data, error } = await supabase.functions.invoke('contact', {
+        body: formData,
+      })
+
+      if (error) throw error
+      if (data?.success === false) throw new Error(data.error || 'Failed to send message')
+
+      toast({
+        title: 'Message Sent',
+        description: "Thank you for reaching out! I'll get back to you soon.",
+      })
+
+      // Reset form on success
+      setFormData({ name: '', email: '', message: '', website: '' })
+    } catch (error: unknown) {
+      console.error('Contact form error:', error)
+      
+      toast({
+        variant: 'destructive',
+        title: 'Send Failed',
+        description: 'There was an issue sending your message. Opening your email client instead...',
+      })
+
+      // Fallback to mailto
+      if (settings?.email) {
+        const subject = encodeURIComponent(`Message from ${formData.name}`)
+        const body = encodeURIComponent(formData.message)
+        window.location.href = `mailto:${settings.email}?subject=${subject}&body=${body}`
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target
+    setFormData(prev => ({ ...prev, [id]: value }))
+  }
 
   return (
     <AnimatedSection id="contact" className="section-container py-16 md:py-24">
@@ -50,27 +106,70 @@ export function Contact() {
           )}
         </div>
 
-        {/* Contact Form - Redirects to mailto to avoid needing backend */}
+        {/* Contact Form */}
         <div className="card-elevated">
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault()
-              if (settings?.email) {
-                window.location.href = `mailto:${settings.email}`
-              }
-            }} 
-            className="space-y-4"
-          >
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Honeypot field - hidden from users */}
+            <div className="hidden">
+              <input 
+                id="website" 
+                type="text" 
+                value={formData.website} 
+                onChange={handleChange} 
+                tabIndex={-1} 
+                autoComplete="off" 
+              />
+            </div>
+
             <div className="space-y-2">
               <label htmlFor="name" className="text-sm font-medium">Name</label>
-              <input id="name" type="text" required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="John Doe" />
+              <input 
+                id="name" 
+                type="text" 
+                required 
+                value={formData.name}
+                onChange={handleChange}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                placeholder="John Doe" 
+              />
             </div>
+
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium">Email</label>
+              <input 
+                id="email" 
+                type="email" 
+                required 
+                value={formData.email}
+                onChange={handleChange}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                placeholder="john@example.com" 
+              />
+            </div>
+
             <div className="space-y-2">
               <label htmlFor="message" className="text-sm font-medium">Message</label>
-              <textarea id="message" required rows={4} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="Hello..." />
+              <textarea 
+                id="message" 
+                required 
+                rows={4} 
+                value={formData.message}
+                onChange={handleChange}
+                className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
+                placeholder="Hello..." 
+              />
             </div>
-            <Button type="submit" className="w-full btn-accent">
-              <Send className="w-4 h-4 mr-2" /> Send Message
+
+            <Button type="submit" className="w-full btn-accent" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Sending...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 mr-2" /> Send Message
+                </>
+              )}
             </Button>
           </form>
         </div>
