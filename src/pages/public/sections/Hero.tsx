@@ -35,13 +35,13 @@ export function Hero() {
         </h1>
 
         {/* Bio / Subcopy */}
-        <p className="text-section-body text-muted-foreground max-w-[600px] mx-auto mb-10 text-lg md:text-xl">
+        <div className="text-section-body text-muted-foreground max-w-[600px] mx-auto mb-10 text-lg md:text-xl">
           {isLoading ? (
             <div className="animate-pulse bg-muted h-6 w-full max-w-md mx-auto rounded-md" />
           ) : (
              settings?.bio || "I build high-performance web applications and autonomous AI agents."
           )}
-        </p>
+        </div>
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
