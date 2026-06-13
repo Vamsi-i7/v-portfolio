@@ -125,7 +125,7 @@ function GitHubCard({ data }: { data: GitHubData }) {
             <img 
               src={profile.avatar_url} 
               alt={profile.username} 
-              className="w-20 h-20 rounded-xl border-2 border-emerald-500/20 shadow-lg"
+              className="w-20 h-20 rounded-xl border-2 border-emerald-500/20 shadow-lg object-cover"
             />
             <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1 rounded-md shadow-lg">
               <GitBranch className="w-4 h-4" />
@@ -266,7 +266,7 @@ function CodeforcesCard({ data }: { data: CodeforcesData }) {
             <img 
               src={profile.avatar} 
               alt={profile.handle} 
-              className="w-20 h-20 rounded-xl border-2 border-border shadow-lg"
+              className="w-20 h-20 rounded-xl border-2 border-border shadow-lg object-cover"
             />
             <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white p-1 rounded-md shadow-lg">
               <Trophy className="w-4 h-4" />
@@ -377,7 +377,7 @@ function LeetCodeCard({ data }: { data: LeetCodeData }) {
             <img 
               src={profile.avatar_url} 
               alt={profile.username} 
-              className="w-20 h-20 rounded-xl border-2 border-border shadow-lg"
+              className="w-20 h-20 rounded-xl border-2 border-border shadow-lg object-cover"
             />
             <div className="absolute -bottom-2 -right-2 text-white p-1 rounded-md shadow-lg" style={{ backgroundColor: accentColor }}>
               <Code2 className="w-4 h-4" />
