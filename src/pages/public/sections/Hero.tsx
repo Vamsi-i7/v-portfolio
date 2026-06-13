@@ -3,6 +3,7 @@ import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
 import { Button } from '@/components/ui/button'
 import { ArrowDown, ChevronRight, Download } from 'lucide-react'
 import { getPublicUrl } from '@/lib/storage'
+import { trackEvent } from '@/lib/analytics'
 
 export function Hero() {
   const { data: settings, isLoading } = useSettings()
@@ -47,20 +48,31 @@ export function Hero() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Button asChild size="lg" className="btn-accent w-full sm:w-auto h-12 px-8 text-base">
-            <a href="#projects">
+            <a 
+              href="#projects"
+              onClick={() => trackEvent('hero_cta_work')}
+            >
               View My Work <ChevronRight className="ml-2 w-4 h-4" />
             </a>
           </Button>
           
           {settings?.resume_path ? (
             <Button asChild size="lg" variant="outline" className="btn-ghost w-full sm:w-auto h-12 px-8 text-base">
-              <a href={getPublicUrl('portfolio-assets', settings.resume_path)} target="_blank" rel="noopener noreferrer">
+              <a 
+                href={getPublicUrl('portfolio-assets', settings.resume_path)} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={() => trackEvent('resume_download', { source: 'hero' })}
+              >
                 <Download className="mr-2 w-4 h-4" /> Download Resume
               </a>
             </Button>
           ) : (
             <Button asChild size="lg" variant="outline" className="btn-ghost w-full sm:w-auto h-12 px-8 text-base">
-              <a href="#about">
+              <a 
+                href="#about"
+                onClick={() => trackEvent('hero_cta_about')}
+              >
                 More About Me
               </a>
             </Button>

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { HelmetProvider } from 'react-helmet-async'
@@ -24,11 +25,28 @@ import { CertificateForm } from '@/pages/admin/Certificates/CertificateForm'
 import { CodingProfilesPage } from '@/pages/admin/CodingProfiles'
 import { PublicLayout } from '@/components/layout/PublicLayout'
 import { Home } from '@/pages/public/Home'
+import { initAnalytics } from '@/lib/analytics'
+
+/**
+ * Component to handle analytics initialization
+ */
+function AnalyticsTracker() {
+  useEffect(() => {
+    initAnalytics()
+  }, [])
+
+  return null
+}
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <PublicLayout />,
+    element: (
+      <>
+        <AnalyticsTracker />
+        <PublicLayout />
+      </>
+    ),
     children: [
       {
         index: true,
@@ -38,11 +56,21 @@ const router = createBrowserRouter([
   },
   {
     path: '/admin/login',
-    element: <Login />,
+    element: (
+      <>
+        <AnalyticsTracker />
+        <Login />
+      </>
+    ),
   },
   {
     path: '/admin',
-    element: <ProtectedRoute />,
+    element: (
+      <>
+        <AnalyticsTracker />
+        <ProtectedRoute />
+      </>
+    ),
     children: [
       {
         element: <AdminLayout />,
