@@ -21,27 +21,19 @@ import { AchievementForm } from '@/pages/admin/Achievements/AchievementForm'
 import { CertificatesList } from '@/pages/admin/Certificates'
 import { CertificateForm } from '@/pages/admin/Certificates/CertificateForm'
 import { CodingProfilesPage } from '@/pages/admin/CodingProfiles'
-// Public site placeholder
-function PublicPlaceholder() {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
-      <div className="card-elevated max-w-md w-full">
-        <h1 className="text-3xl font-display font-bold mb-4">V Portfolio</h1>
-        <p className="text-muted-foreground mb-6">
-          Public site structure will be built in Wave 3.
-        </p>
-        <a href="/admin/login" className="text-accent hover:underline text-sm font-medium">
-          Admin Login
-        </a>
-      </div>
-    </div>
-  )
-}
+import { PublicLayout } from '@/components/layout/PublicLayout'
+import { Home } from '@/pages/public/Home'
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <PublicPlaceholder />,
+    element: <PublicLayout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+    ],
   },
   {
     path: '/admin/login',
