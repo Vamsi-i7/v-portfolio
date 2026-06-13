@@ -1,6 +1,6 @@
 import { useCodingCache } from '@/hooks/queries/useCodingCache'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
-import { GitBranch, Star, Book, Users, Calendar, Activity, Trophy, TrendingUp, Hash } from 'lucide-react'
+import { GitBranch, Star, Book, Users, Calendar, Activity, Trophy, TrendingUp, Hash, Code2, Target, Award, BarChart3 } from 'lucide-react'
 
 interface GitHubData {
   profile: {
@@ -54,6 +54,29 @@ interface CodeforcesData {
   };
 }
 
+interface LeetCodeData {
+  profile: {
+    username: string;
+    avatar_url: string;
+    ranking: number;
+  };
+  stats: {
+    total_solved: number;
+    easy_solved: number;
+    medium_solved: number;
+    hard_solved: number;
+  };
+  contest: {
+    rating: number;
+    attended_count: number;
+    global_ranking: number;
+    top_percentage: number;
+  };
+  metadata: {
+    last_synced_at: string;
+  };
+}
+
 export function CodingProfiles() {
   const { data: cacheEntries, isLoading } = useCodingCache()
 
@@ -63,7 +86,10 @@ export function CodingProfiles() {
   const cfEntry = cacheEntries?.find(entry => entry.platform === 'codeforces')
   const cfData = cfEntry?.data as unknown as CodeforcesData
 
-  if (isLoading || (!githubData && !cfData)) return null
+  const lcEntry = cacheEntries?.find(entry => entry.platform === 'leetcode')
+  const lcData = lcEntry?.data as unknown as LeetCodeData
+
+  if (isLoading || (!githubData && !cfData && !lcData)) return null
 
   return (
     <AnimatedSection id="engineering-footprint" className="section-container py-24">
@@ -77,6 +103,7 @@ export function CodingProfiles() {
       <div className="flex flex-col gap-12">
         {githubData && <GitHubCard data={githubData} />}
         {cfData && <CodeforcesCard data={cfData} />}
+        {lcData && <LeetCodeCard data={lcData} />}
       </div>
     </AnimatedSection>
   )
@@ -313,6 +340,170 @@ function CodeforcesCard({ data }: { data: CodeforcesData }) {
           >
             View Codeforces Profile
             <Trophy className="w-4 h-4" />
+          </a>
+          <p className="text-[10px] text-muted-foreground mt-4 font-mono uppercase">
+            Last Synced: {new Date(metadata.last_synced_at).toLocaleString()}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function LeetCodeCard({ data }: { data: LeetCodeData }) {
+  const { profile, stats, contest, metadata } = data
+  const accentColor = '#FFA116' // LeetCode brand orange
+
+  // Difficulty colors
+  const difficultyColors = {
+    easy: '#00b8a3',
+    medium: '#ffc01e',
+    hard: '#ff375f',
+  }
+
+  const totalProblems = stats.easy_solved + stats.medium_solved + stats.hard_solved
+  const hasContestData = contest.attended_count > 0
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Main Profile & Stats Bento Card */}
+      <div className="lg:col-span-2 glass-card rounded-2xl p-8 relative overflow-hidden group border-l-4" style={{ borderLeftColor: accentColor }}>
+        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <Code2 className="w-24 h-24" />
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-8 items-start md:items-center mb-8">
+          <div className="relative">
+            <img 
+              src={profile.avatar_url} 
+              alt={profile.username} 
+              className="w-20 h-20 rounded-xl border-2 border-border shadow-lg"
+            />
+            <div className="absolute -bottom-2 -right-2 text-white p-1 rounded-md shadow-lg" style={{ backgroundColor: accentColor }}>
+              <Code2 className="w-4 h-4" />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <h3 className="text-2xl font-display font-bold">leetcode.com/u/{profile.username}</h3>
+              {profile.ranking > 0 && (
+                <span className="text-xs font-medium px-2.5 py-0.5 rounded-full border bg-surface/50" style={{ color: accentColor, borderColor: `${accentColor}33` }}>
+                  #{profile.ranking.toLocaleString()}
+                </span>
+              )}
+            </div>
+            <p className="text-muted-foreground flex items-center gap-2">
+              <Target className="w-4 h-4" />
+              {totalProblems} problems conquered across all difficulties
+            </p>
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <StatCell label="Total Solved" value={stats.total_solved} icon={<Award className="w-4 h-4" />} />
+          <StatCell label="Easy" value={stats.easy_solved} icon={<Target className="w-4 h-4" />} valueClass="text-[#00b8a3]" />
+          <StatCell label="Medium" value={stats.medium_solved} icon={<BarChart3 className="w-4 h-4" />} valueClass="text-[#ffc01e]" />
+          <StatCell label="Hard" value={stats.hard_solved} icon={<Trophy className="w-4 h-4" />} valueClass="text-[#ff375f]" />
+        </div>
+
+        {/* Difficulty Breakdown Bar */}
+        <div className="space-y-3">
+          <div className="flex justify-between items-center text-sm">
+            <span className="font-medium">Difficulty Breakdown</span>
+            <span className="text-muted-foreground text-xs">Accepted solutions</span>
+          </div>
+          <div className="h-3 w-full bg-surface rounded-full overflow-hidden flex border border-border/50">
+            {stats.easy_solved > 0 && (
+              <div 
+                className="h-full transition-all hover:scale-y-110"
+                style={{ width: `${(stats.easy_solved / totalProblems) * 100}%`, backgroundColor: difficultyColors.easy }}
+                title={`Easy: ${stats.easy_solved}`}
+              />
+            )}
+            {stats.medium_solved > 0 && (
+              <div 
+                className="h-full transition-all hover:scale-y-110"
+                style={{ width: `${(stats.medium_solved / totalProblems) * 100}%`, backgroundColor: difficultyColors.medium }}
+                title={`Medium: ${stats.medium_solved}`}
+              />
+            )}
+            {stats.hard_solved > 0 && (
+              <div 
+                className="h-full transition-all hover:scale-y-110"
+                style={{ width: `${(stats.hard_solved / totalProblems) * 100}%`, backgroundColor: difficultyColors.hard }}
+                title={`Hard: ${stats.hard_solved}`}
+              />
+            )}
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: difficultyColors.easy }} />
+              <span className="text-xs text-muted-foreground">Easy ({stats.easy_solved})</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: difficultyColors.medium }} />
+              <span className="text-xs text-muted-foreground">Medium ({stats.medium_solved})</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: difficultyColors.hard }} />
+              <span className="text-xs text-muted-foreground">Hard ({stats.hard_solved})</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Contest & Ranking Sidebar Card */}
+      <div className="glass-card rounded-2xl p-8 flex flex-col justify-between border-t-4" style={{ borderTopColor: accentColor }}>
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-display font-bold text-xl">Contest Stats</h3>
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: accentColor }} />
+          </div>
+          
+          <div className="space-y-6">
+            {hasContestData ? (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-xl bg-surface/50 border border-border/50 text-center">
+                    <p className="text-xs text-muted-foreground mb-1">Rating</p>
+                    <p className="text-xl font-display font-bold" style={{ color: accentColor }}>{contest.rating}</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-surface/50 border border-border/50 text-center">
+                    <p className="text-xs text-muted-foreground mb-1">Contests</p>
+                    <p className="text-xl font-display font-bold">{contest.attended_count}</p>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-border/50" style={{ backgroundColor: `${accentColor}08` }}>
+                  <p className="text-xs font-medium mb-2 uppercase tracking-wider" style={{ color: accentColor }}>Competitive Standing</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Ranked <strong>Top {contest.top_percentage}%</strong> globally out of {contest.global_ranking > 0 ? `#${contest.global_ranking.toLocaleString()}` : 'all participants'}.
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="p-4 rounded-xl border border-border/50" style={{ backgroundColor: `${accentColor}08` }}>
+                <p className="text-xs font-medium mb-2 uppercase tracking-wider" style={{ color: accentColor }}>Problem Solving Focus</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Focused on building a strong problem-solving foundation with <strong>{stats.total_solved}</strong> accepted solutions.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-border/50 text-center">
+          <a 
+            href={`https://leetcode.com/u/${profile.username}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm hover:opacity-80 transition-colors font-medium inline-flex items-center gap-2"
+            style={{ color: accentColor }}
+          >
+            View LeetCode Profile
+            <Code2 className="w-4 h-4" />
           </a>
           <p className="text-[10px] text-muted-foreground mt-4 font-mono uppercase">
             Last Synced: {new Date(metadata.last_synced_at).toLocaleString()}
