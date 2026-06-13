@@ -89,8 +89,8 @@ export function CertificateForm() {
         certificate_image_path: certificate.certificate_image_path || '',
         verification_url: certificate.verification_url || '',
         credential_id: certificate.credential_id || '',
-        issued_at: certificate.issued_at,
-        expires_at: certificate.expires_at || '',
+        issued_at: certificate.issued_at ? certificate.issued_at.split('T')[0] : '',
+        expires_at: certificate.expires_at ? certificate.expires_at.split('T')[0] : '',
         has_expiry: certificate.has_expiry || false,
         is_featured: certificate.is_featured || false,
         status: (certificate.status as 'draft' | 'published') || 'draft',
@@ -152,7 +152,7 @@ export function CertificateForm() {
           <div className="space-y-4">
             <Label>Issuer Logo</Label>
             <ImageUpload
-              bucket="logos"
+              bucket="portfolio-assets"
               value={watch('issuer_logo_path') || null}
               onChange={(path: string) => setValue('issuer_logo_path', path, { shouldDirty: true })}
               onRemove={() => setValue('issuer_logo_path', null, { shouldDirty: true })}
@@ -162,7 +162,7 @@ export function CertificateForm() {
           <div className="space-y-4">
             <Label>Certificate Image (Optional)</Label>
             <ImageUpload
-              bucket="certificates"
+              bucket="portfolio-assets"
               value={watch('certificate_image_path') || null}
               onChange={(path: string) => setValue('certificate_image_path', path, { shouldDirty: true })}
               onRemove={() => setValue('certificate_image_path', null, { shouldDirty: true })}
@@ -214,6 +214,7 @@ export function CertificateForm() {
                 <SelectItem value="published">Published</SelectItem>
               </SelectContent>
             </Select>
+            {errors.status && <p className="text-sm text-destructive">{errors.status.message}</p>}
           </div>
 
           <div className="space-y-2">
@@ -238,6 +239,7 @@ export function CertificateForm() {
             <div className="space-y-2">
               <Label htmlFor="expires_at">Expiry Date</Label>
               <Input id="expires_at" type="date" {...register('expires_at')} />
+              {errors.expires_at && <p className="text-sm text-destructive">{errors.expires_at.message}</p>}
             </div>
           )}
 

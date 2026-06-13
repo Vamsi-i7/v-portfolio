@@ -1,7 +1,8 @@
 import { useSettings } from '@/hooks/queries/useSettings'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
 import { Button } from '@/components/ui/button'
-import { ArrowDown, ChevronRight } from 'lucide-react'
+import { ArrowDown, ChevronRight, Download } from 'lucide-react'
+import { getPublicUrl } from '@/lib/storage'
 
 export function Hero() {
   const { data: settings, isLoading } = useSettings()
@@ -35,7 +36,7 @@ export function Hero() {
         </h1>
 
         {/* Bio / Subcopy */}
-        <div className="text-section-body text-muted-foreground max-w-[600px] mx-auto mb-10 text-lg md:text-xl">
+        <div className="text-section-body text-muted-foreground max-w-[500px] mx-auto mb-12 text-lg md:text-xl">
           {isLoading ? (
             <div className="animate-pulse bg-muted h-6 w-full max-w-md mx-auto rounded-md" />
           ) : (
@@ -50,11 +51,20 @@ export function Hero() {
               View My Work <ChevronRight className="ml-2 w-4 h-4" />
             </a>
           </Button>
-          <Button asChild size="lg" variant="outline" className="btn-ghost w-full sm:w-auto h-12 px-8 text-base">
-            <a href="#about">
-              More About Me
-            </a>
-          </Button>
+          
+          {settings?.resume_path ? (
+            <Button asChild size="lg" variant="outline" className="btn-ghost w-full sm:w-auto h-12 px-8 text-base">
+              <a href={getPublicUrl('portfolio-assets', settings.resume_path)} target="_blank" rel="noopener noreferrer">
+                <Download className="mr-2 w-4 h-4" /> Download Resume
+              </a>
+            </Button>
+          ) : (
+            <Button asChild size="lg" variant="outline" className="btn-ghost w-full sm:w-auto h-12 px-8 text-base">
+              <a href="#about">
+                More About Me
+              </a>
+            </Button>
+          )}
         </div>
 
       </div>

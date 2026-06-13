@@ -1,8 +1,8 @@
-import { Home, User, FolderGit2, Map, Mail } from 'lucide-react'
+import { Home, Briefcase, FolderGit2, Map, Mail } from 'lucide-react'
 
 const MOBILE_NAV_LINKS = [
   { href: '#home', label: 'Home', icon: Home },
-  { href: '#about', label: 'About', icon: User },
+  { href: '#experience', label: 'Exp', icon: Briefcase },
   { href: '#projects', label: 'Work', icon: FolderGit2 },
   { href: '#journey', label: 'Journey', icon: Map },
   { href: '#contact', label: 'Contact', icon: Mail },

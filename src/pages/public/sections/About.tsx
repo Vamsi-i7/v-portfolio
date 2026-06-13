@@ -2,6 +2,7 @@ import { useSettings } from '@/hooks/queries/useSettings'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
 import { Button } from '@/components/ui/button'
 import { FileText, User } from 'lucide-react'
+import { getPublicUrl } from '@/lib/storage'
 
 export function About() {
   const { data: settings, isLoading } = useSettings()
@@ -23,7 +24,7 @@ export function About() {
   }
 
   return (
-    <AnimatedSection id="about" className="section-container">
+    <AnimatedSection id="about" className="section-container py-16 md:py-24">
       <div className="flex flex-col md:flex-row gap-12 items-center md:items-start">
         
         {/* Profile Image Column */}
@@ -31,7 +32,7 @@ export function About() {
           <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-bg-surface shadow-xl relative z-10 bg-muted flex items-center justify-center">
             {settings?.profile_image_path ? (
               <img 
-                src={settings.profile_image_path} 
+                src={getPublicUrl('portfolio-assets', settings.profile_image_path)} 
                 alt={settings.full_name || 'Profile'} 
                 className="w-full h-full object-cover"
                 onError={(e) => {
