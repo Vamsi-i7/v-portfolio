@@ -3,6 +3,7 @@ import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
 import { Button } from '@/components/ui/button'
 import { Code2, ExternalLink, Image as ImageIcon } from 'lucide-react'
 import { getPublicUrl } from '@/lib/storage'
+import { trackEvent } from '@/lib/analytics'
 
 export function Projects() {
   const { data: projects, isLoading } = useProjects()
@@ -111,14 +112,24 @@ export function Projects() {
                 <div className="flex items-center gap-3 mt-auto pt-5 border-t border-border/50">
                   {project.github_url && (
                     <Button asChild variant="outline" size="sm" className="btn-ghost flex-1 h-10">
-                      <a href={project.github_url} target="_blank" rel="noopener noreferrer">
+                      <a 
+                        href={project.github_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        onClick={() => trackEvent('project_github', { title: project.title })}
+                      >
                         <Code2 className="w-4 h-4 mr-2" /> Code
                       </a>
                     </Button>
                   )}
                   {project.demo_url && (
                     <Button asChild size="sm" className="btn-accent flex-1 h-10">
-                      <a href={project.demo_url} target="_blank" rel="noopener noreferrer">
+                      <a 
+                        href={project.demo_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        onClick={() => trackEvent('project_demo', { title: project.title })}
+                      >
                         <ExternalLink className="w-4 h-4 mr-2" /> Live Demo
                       </a>
                     </Button>

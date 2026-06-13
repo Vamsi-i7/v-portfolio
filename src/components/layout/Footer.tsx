@@ -1,6 +1,7 @@
 import { useSettings } from '@/hooks/queries/useSettings'
 import { ArrowUp, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { trackEvent } from '@/lib/analytics'
 
 export function Footer() {
   const { data: settings } = useSettings()
@@ -30,22 +31,48 @@ export function Footer() {
           {/* Social Links */}
           <div className="flex items-center gap-4">
             {socialLinks?.github && (
-              <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted flex items-center justify-center">
+              <a 
+                href={socialLinks.github} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="GitHub" 
+                className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted flex items-center justify-center"
+                onClick={() => trackEvent('social_click', { platform: 'github' })}
+              >
                 <i className="devicon-github-original text-xl" />
               </a>
             )}
             {socialLinks?.linkedin && (
-              <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted flex items-center justify-center">
+              <a 
+                href={socialLinks.linkedin} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="LinkedIn" 
+                className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted flex items-center justify-center"
+                onClick={() => trackEvent('social_click', { platform: 'linkedin' })}
+              >
                 <i className="devicon-linkedin-plain text-xl" />
               </a>
             )}
             {socialLinks?.twitter && (
-              <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted flex items-center justify-center">
+              <a 
+                href={socialLinks.twitter} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="Twitter" 
+                className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted flex items-center justify-center"
+                onClick={() => trackEvent('social_click', { platform: 'twitter' })}
+              >
                 <i className="devicon-twitter-original text-xl" />
               </a>
             )}
             {settings?.email && (
-              <a href={`mailto:${settings.email}`} aria-label="Email" className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted md:hidden flex items-center justify-center">
+              <a 
+                href={`mailto:${settings.email}`} 
+                aria-label="Email" 
+                className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted md:hidden flex items-center justify-center"
+                onClick={() => trackEvent('social_click', { platform: 'email' })}
+              >
                 <Mail className="w-5 h-5" />
               </a>
             )}

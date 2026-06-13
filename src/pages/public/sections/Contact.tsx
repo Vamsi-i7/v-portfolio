@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Mail, MapPin, Send, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
+import { trackEvent } from '@/lib/analytics'
 
 export function Contact() {
   const { data: settings } = useSettings()
@@ -34,6 +35,8 @@ export function Contact() {
         title: 'Message Sent',
         description: "Thank you for reaching out! I'll get back to you soon.",
       })
+      
+      trackEvent('contact_submit', { status: 'success' })
 
       // Reset form on success
       setFormData({ name: '', email: '', message: '', website: '' })
@@ -45,6 +48,8 @@ export function Contact() {
         title: 'Send Failed',
         description: 'There was an issue sending your message. Opening your email client instead...',
       })
+      
+      trackEvent('contact_submit', { status: 'fallback' })
 
       // Fallback to mailto
       if (settings?.email) {

@@ -1,6 +1,7 @@
 import { useCodingCache } from '@/hooks/queries/useCodingCache'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
-import { GitBranch, Star, Book, Users, Calendar, Activity, Trophy, TrendingUp, Hash, Code2, Target, Award, BarChart3 } from 'lucide-react'
+import { GitBranch, Star, Book, Users, Calendar, Activity, Trophy, TrendingUp, Hash, Code2, Target } from 'lucide-react'
+import { trackEvent } from '@/lib/analytics'
 
 interface GitHubData {
   profile: {
@@ -102,8 +103,8 @@ export function CodingProfiles() {
 
       <div className="flex flex-col gap-12">
         {githubData && <GitHubCard data={githubData} />}
-        {cfData && <CodeforcesCard data={cfData} />}
         {lcData && <LeetCodeCard data={lcData} />}
+        {cfData && <CodeforcesCard data={cfData} />}
       </div>
     </AnimatedSection>
   )
@@ -125,7 +126,7 @@ function GitHubCard({ data }: { data: GitHubData }) {
             <img 
               src={profile.avatar_url} 
               alt={profile.username} 
-              className="w-20 h-20 rounded-xl border-2 border-emerald-500/20 shadow-lg"
+              className="w-20 h-20 rounded-xl border-2 border-emerald-500/20 shadow-lg object-cover"
             />
             <div className="absolute -bottom-2 -right-2 bg-emerald-500 text-white p-1 rounded-md shadow-lg">
               <GitBranch className="w-4 h-4" />
@@ -222,6 +223,7 @@ function GitHubCard({ data }: { data: GitHubData }) {
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-emerald-500 hover:text-emerald-400 transition-colors font-medium inline-flex items-center gap-2"
+            onClick={() => trackEvent('platform_click', { platform: 'github' })}
           >
             View Full Footprint
             <GitBranch className="w-4 h-4" />
@@ -266,7 +268,7 @@ function CodeforcesCard({ data }: { data: CodeforcesData }) {
             <img 
               src={profile.avatar} 
               alt={profile.handle} 
-              className="w-20 h-20 rounded-xl border-2 border-border shadow-lg"
+              className="w-20 h-20 rounded-xl border-2 border-border shadow-lg object-cover"
             />
             <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white p-1 rounded-md shadow-lg">
               <Trophy className="w-4 h-4" />
@@ -337,6 +339,7 @@ function CodeforcesCard({ data }: { data: CodeforcesData }) {
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-blue-500 hover:text-blue-400 transition-colors font-medium inline-flex items-center gap-2"
+            onClick={() => trackEvent('platform_click', { platform: 'codeforces' })}
           >
             View Codeforces Profile
             <Trophy className="w-4 h-4" />
@@ -352,16 +355,8 @@ function CodeforcesCard({ data }: { data: CodeforcesData }) {
 
 function LeetCodeCard({ data }: { data: LeetCodeData }) {
   const { profile, stats, contest, metadata } = data
-  const accentColor = '#FFA116' // LeetCode brand orange
+  const accentColor = '#ffa116' // LeetCode Amber
 
-  // Difficulty colors
-  const difficultyColors = {
-    easy: '#00b8a3',
-    medium: '#ffc01e',
-    hard: '#ff375f',
-  }
-
-  const totalProblems = stats.easy_solved + stats.medium_solved + stats.hard_solved
   const hasContestData = contest.attended_count > 0
 
   return (
@@ -377,7 +372,7 @@ function LeetCodeCard({ data }: { data: LeetCodeData }) {
             <img 
               src={profile.avatar_url} 
               alt={profile.username} 
-              className="w-20 h-20 rounded-xl border-2 border-border shadow-lg"
+              className="w-20 h-20 rounded-xl border-2 border-border shadow-lg object-cover"
             />
             <div className="absolute -bottom-2 -right-2 text-white p-1 rounded-md shadow-lg" style={{ backgroundColor: accentColor }}>
               <Code2 className="w-4 h-4" />
@@ -388,110 +383,59 @@ function LeetCodeCard({ data }: { data: LeetCodeData }) {
             <div className="flex items-center gap-3 mb-1">
               <h3 className="text-2xl font-display font-bold">leetcode.com/u/{profile.username}</h3>
               {profile.ranking > 0 && (
-                <span className="text-xs font-medium px-2.5 py-0.5 rounded-full border bg-surface/50" style={{ color: accentColor, borderColor: `${accentColor}33` }}>
-                  #{profile.ranking.toLocaleString()}
+                <span className="bg-amber-500/10 text-amber-500 text-xs font-bold px-2.5 py-0.5 rounded-full border border-amber-500/20">
+                  RANK {profile.ranking.toLocaleString()}
                 </span>
               )}
             </div>
             <p className="text-muted-foreground flex items-center gap-2">
               <Target className="w-4 h-4" />
-              {totalProblems} problems conquered across all difficulties
+              Solved: <span className="font-bold text-foreground">{stats.total_solved}</span> Problems
             </p>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <StatCell label="Total Solved" value={stats.total_solved} icon={<Award className="w-4 h-4" />} />
-          <StatCell label="Easy" value={stats.easy_solved} icon={<Target className="w-4 h-4" />} valueClass="text-[#00b8a3]" />
-          <StatCell label="Medium" value={stats.medium_solved} icon={<BarChart3 className="w-4 h-4" />} valueClass="text-[#ffc01e]" />
-          <StatCell label="Hard" value={stats.hard_solved} icon={<Trophy className="w-4 h-4" />} valueClass="text-[#ff375f]" />
-        </div>
-
-        {/* Difficulty Breakdown Bar */}
-        <div className="space-y-3">
-          <div className="flex justify-between items-center text-sm">
-            <span className="font-medium">Difficulty Breakdown</span>
-            <span className="text-muted-foreground text-xs">Accepted solutions</span>
-          </div>
-          <div className="h-3 w-full bg-surface rounded-full overflow-hidden flex border border-border/50">
-            {stats.easy_solved > 0 && (
-              <div 
-                className="h-full transition-all hover:scale-y-110"
-                style={{ width: `${(stats.easy_solved / totalProblems) * 100}%`, backgroundColor: difficultyColors.easy }}
-                title={`Easy: ${stats.easy_solved}`}
-              />
-            )}
-            {stats.medium_solved > 0 && (
-              <div 
-                className="h-full transition-all hover:scale-y-110"
-                style={{ width: `${(stats.medium_solved / totalProblems) * 100}%`, backgroundColor: difficultyColors.medium }}
-                title={`Medium: ${stats.medium_solved}`}
-              />
-            )}
-            {stats.hard_solved > 0 && (
-              <div 
-                className="h-full transition-all hover:scale-y-110"
-                style={{ width: `${(stats.hard_solved / totalProblems) * 100}%`, backgroundColor: difficultyColors.hard }}
-                title={`Hard: ${stats.hard_solved}`}
-              />
-            )}
-          </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-2">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: difficultyColors.easy }} />
-              <span className="text-xs text-muted-foreground">Easy ({stats.easy_solved})</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: difficultyColors.medium }} />
-              <span className="text-xs text-muted-foreground">Medium ({stats.medium_solved})</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: difficultyColors.hard }} />
-              <span className="text-xs text-muted-foreground">Hard ({stats.hard_solved})</span>
-            </div>
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCell label="Solved" value={stats.total_solved} icon={<Code2 className="w-4 h-4" />} />
+          <StatCell label="Easy" value={stats.easy_solved} icon={<div className="w-2 h-2 rounded-full bg-emerald-500" />} />
+          <StatCell label="Medium" value={stats.medium_solved} icon={<div className="w-2 h-2 rounded-full bg-amber-500" />} />
+          <StatCell label="Hard" value={stats.hard_solved} icon={<div className="w-2 h-2 rounded-full bg-rose-500" />} />
         </div>
       </div>
 
-      {/* Contest & Ranking Sidebar Card */}
       <div className="glass-card rounded-2xl p-8 flex flex-col justify-between border-t-4" style={{ borderTopColor: accentColor }}>
         <div>
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-display font-bold text-xl">Contest Stats</h3>
-            <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: accentColor }} />
+            <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
           </div>
           
-          <div className="space-y-6">
-            {hasContestData ? (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 rounded-xl bg-surface/50 border border-border/50 text-center">
-                    <p className="text-xs text-muted-foreground mb-1">Rating</p>
-                    <p className="text-xl font-display font-bold" style={{ color: accentColor }}>{contest.rating}</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-surface/50 border border-border/50 text-center">
-                    <p className="text-xs text-muted-foreground mb-1">Contests</p>
-                    <p className="text-xl font-display font-bold">{contest.attended_count}</p>
-                  </div>
+          {hasContestData ? (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Rating</p>
+                  <p className="text-xl font-bold">{contest.rating}</p>
                 </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Top %</p>
+                  <p className="text-xl font-bold">{contest.top_percentage}%</p>
+                </div>
+              </div>
 
-                <div className="p-4 rounded-xl border border-border/50" style={{ backgroundColor: `${accentColor}08` }}>
-                  <p className="text-xs font-medium mb-2 uppercase tracking-wider" style={{ color: accentColor }}>Competitive Standing</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Ranked <strong>Top {contest.top_percentage}%</strong> globally out of {contest.global_ranking > 0 ? `#${contest.global_ranking.toLocaleString()}` : 'all participants'}.
-                  </p>
-                </div>
-              </>
-            ) : (
-              <div className="p-4 rounded-xl border border-border/50" style={{ backgroundColor: `${accentColor}08` }}>
-                <p className="text-xs font-medium mb-2 uppercase tracking-wider" style={{ color: accentColor }}>Problem Solving Focus</p>
+              <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                <p className="text-xs text-amber-600 font-medium mb-2 uppercase tracking-wider">Performance Signal</p>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Focused on building a strong problem-solving foundation with <strong>{stats.total_solved}</strong> accepted solutions.
+                  Attended <strong>{contest.attended_count}</strong> contests with a global ranking of <strong>{contest.global_ranking.toLocaleString()}</strong>.
                 </p>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <Trophy className="w-8 h-8 text-muted-foreground/30 mb-2" />
+              <p className="text-sm text-muted-foreground italic">No contest participation yet.</p>
+            </div>
+          )}
         </div>
 
         <div className="mt-8 pt-6 border-t border-border/50 text-center">
@@ -499,8 +443,8 @@ function LeetCodeCard({ data }: { data: LeetCodeData }) {
             href={`https://leetcode.com/u/${profile.username}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm hover:opacity-80 transition-colors font-medium inline-flex items-center gap-2"
-            style={{ color: accentColor }}
+            className="text-sm text-amber-600 hover:text-amber-500 transition-colors font-medium inline-flex items-center gap-2"
+            onClick={() => trackEvent('platform_click', { platform: 'leetcode' })}
           >
             View LeetCode Profile
             <Code2 className="w-4 h-4" />
