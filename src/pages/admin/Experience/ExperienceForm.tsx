@@ -99,8 +99,6 @@ export function ExperienceForm() {
   }, [experience, isEditing, reset])
 
   const onSubmit = async (data: ExperienceFormValues) => {
-    console.log('[DEBUG] ExperienceForm onSubmit triggered');
-    console.log('[DEBUG] Form data received:', JSON.stringify(data, null, 2));
 
     try {
       const technologiesArray = data.technologies 
@@ -120,11 +118,9 @@ export function ExperienceForm() {
         ...(isEditing && id ? { id } : {}),
       }
 
-      console.log('[DEBUG] Sending payload to mutation:', JSON.stringify(payload, null, 2));
 
       const result = await saveExperience(payload)
       
-      console.log('[DEBUG] SaveExperience result:', result);
 
       toast({
         title: `Experience ${isEditing ? 'Updated' : 'Created'}`,
@@ -133,7 +129,6 @@ export function ExperienceForm() {
       
       navigate('/admin/experience')
     } catch (err: unknown) {
-      console.error('[DEBUG] ExperienceForm Submit Error:', err);
       
       const error = err as { message?: string, code?: string, details?: string, hint?: string };
       

@@ -97,8 +97,6 @@ export function ProjectForm() {
   }, [project, isEditing, reset])
 
   const onSubmit = async (data: ProjectFormValues) => {
-    console.log('[DEBUG] ProjectForm onSubmit triggered');
-    console.log('[DEBUG] Form data received:', JSON.stringify(data, null, 2));
 
     try {
       const techStackArray = data.tech_stack 
@@ -115,11 +113,9 @@ export function ProjectForm() {
         ...(isEditing && id ? { id } : {}),
       }
 
-      console.log('[DEBUG] Sending payload to mutation:', JSON.stringify(payload, null, 2));
 
       const result = await saveProject(payload)
       
-      console.log('[DEBUG] SaveProject result:', result);
 
       toast({
         title: `Project ${isEditing ? 'Updated' : 'Created'}`,
@@ -128,7 +124,6 @@ export function ProjectForm() {
       
       navigate('/admin/projects')
     } catch (err: unknown) {
-      console.error('[DEBUG] ProjectForm Submit Error:', err);
       
       // Type-safe handling for Supabase error objects
       const error = err as { message?: string, code?: string, details?: string, hint?: string };

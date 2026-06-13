@@ -31,8 +31,6 @@ serve(async (req) => {
   }
 
   try {
-    console.log('[DEBUG] sync-github started');
-    console.log('[DEBUG] GITHUB_PAT exists:', !!GITHUB_PAT);
 
     const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!)
 
@@ -43,13 +41,11 @@ serve(async (req) => {
       .single()
 
     if (settingsError) {
-      console.error('[DEBUG] Settings Fetch Error:', settingsError);
       throw settingsError;
     }
     
     const socialLinks = settings.social_links as Record<string, string> | null;
     const githubUsername = socialLinks?.github;
-    console.log('[DEBUG] settings.social_links.github:', githubUsername);
 
     if (!githubUsername) {
       throw new Error('GitHub username not configured in settings.')
@@ -60,7 +56,6 @@ serve(async (req) => {
       ? githubUsername.split('github.com/').pop()?.split('/')[0] 
       : githubUsername;
     
-    console.log('[DEBUG] Extracted username:', username);
 
     const headers = {
       'Authorization': `Bearer ${GITHUB_PAT}`,
@@ -69,7 +64,6 @@ serve(async (req) => {
     }
 
     // 2. Fetch User Profile
-    console.log(`[DEBUG] Fetching GitHub profile for ${username}...`);
     const userRes = await fetch(`https://api.github.com/users/${username}`, { headers })
     
     if (!userRes.ok) {
@@ -85,7 +79,6 @@ serve(async (req) => {
     const user = await userRes.json() as GitHubUser
 
     // 3. Fetch Repositories (paginated - first 100 for MVP)
-    console.log(`[DEBUG] Fetching GitHub repos for ${username}...`);
     const reposRes = await fetch(`https://api.github.com/users/${username}/repos?per_page=100&sort=updated`, { headers })
     
     if (!reposRes.ok) {
@@ -101,7 +94,6 @@ serve(async (req) => {
     const repos = await reposRes.json() as GitHubRepo[]
 
     // 4. Aggregate Data
-    console.log(`[DEBUG] Aggregating data for ${repos.length} repos...`);
     let totalStars = 0
     const languagesMap: Record<string, number> = {}
     
@@ -156,7 +148,6 @@ serve(async (req) => {
     }
 
     // 5. Upsert into coding_cache
-    console.log('[DEBUG] Upserting into coding_cache...');
     const { error: upsertError } = await supabase
       .from('coding_cache')
       .upsert({
@@ -168,11 +159,9 @@ serve(async (req) => {
       }, { onConflict: 'platform, cache_key' })
 
     if (upsertError) {
-      console.error('[DEBUG] Cache Upsert Error:', upsertError);
       throw upsertError;
     }
 
-    console.log('[DEBUG] Sync successful');
     return new Response(JSON.stringify({ success: true, data: payload }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
