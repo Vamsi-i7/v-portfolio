@@ -1,143 +1,158 @@
+import { useState } from 'react'
 import { useCertificates } from '@/hooks/queries/useCertificates'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
-import { BadgeCheck, Calendar, Shield, ArrowRight, Award } from 'lucide-react'
 import { getPublicUrl } from '@/lib/storage'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Award, ExternalLink, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import type { Tables } from '@/types/database.types'
 
 export function Certificates() {
   const { data: certificates, isLoading } = useCertificates()
+  const [selectedCert, setSelectedCert] = useState<Tables<'certificates'> | null>(null)
 
   if (isLoading || !certificates?.length) return null
 
   return (
-    <AnimatedSection id="certificates" className="section-container" aria-labelledby="certificates-title">
-      <div className="mb-10 md:mb-16">
-        <span className="section-label mb-2">Verified Proof</span>
-        <h2 id="certificates-title" className="text-section font-display font-bold tracking-tight mb-4">
-          Licenses & Certifications
+    <AnimatedSection id="certifications" className="section-container relative" aria-labelledby="certs-title">
+      <div className="mb-12">
+        <span className="section-label">Verified Proof</span>
+        <h2 id="certs-title" className="text-section font-display font-bold tracking-tight mt-2">
+          Certifications
         </h2>
-        <p className="text-muted-foreground text-lg max-w-2xl">
-          Official credentials, validated expertise, and industry-recognized certifications.
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {certificates
-          .sort((a, b) => new Date(b.issued_at).getTime() - new Date(a.issued_at).getTime())
-          .map((cert) => {
-            const isFeatured = cert.is_featured
-            
-            const formattedDate = new Date(cert.issued_at).toLocaleDateString('en-US', {
-              month: 'short',
-              year: 'numeric'
-            })
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {certificates.map((cert, index) => {
+          const year = new Date(cert.issued_at).getFullYear()
+          const logoUrl = cert.issuer_logo_path ? getPublicUrl('portfolio-assets', cert.issuer_logo_path) : null
+          const hasImage = !!cert.certificate_image_path
 
-            return (
+          return (
+            <motion.div
+              key={cert.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="group bg-bg-surface border border-bg-border rounded-xl overflow-hidden shadow-sm hover:shadow-glow-accent hover:border-accent-primary transition-all"
+            >
+              {/* Image Preview Area */}
               <div 
-                key={cert.id} 
-                className={`glass-card border border-border/50 flex flex-col sm:flex-row overflow-hidden group transition-all duration-300 hover:border-accent/40 hover:shadow-[0_8px_30px_rgb(var(--accent-rgb),0.08)] bg-surface/30 hover:bg-surface/60 ${
-                  isFeatured ? 'md:col-span-2' : ''
-                }`}
+                className={`relative aspect-video w-full border-b border-bg-border overflow-hidden ${hasImage ? 'cursor-pointer' : 'bg-bg-elevated'}`}
+                onClick={() => hasImage && setSelectedCert(cert)}
               >
-                {/* Image Proof Strip (Optional) */}
-                {cert.certificate_image_path && (
-                  <div className={`relative flex-shrink-0 bg-muted/10 border-b sm:border-b-0 sm:border-r border-border/50 overflow-hidden ${
-                    isFeatured ? 'h-48 sm:h-auto sm:w-64' : 'h-40 sm:h-auto sm:w-48'
-                  }`}>
-                    <a 
-                      href={getPublicUrl('portfolio-assets', cert.certificate_image_path)} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="block w-full h-full relative cursor-zoom-in group/image"
-                      title="View full certificate"
-                    >
-                      <div className="absolute inset-0 bg-accent/0 group-hover/image:bg-accent/10 transition-colors duration-300 z-10 flex items-center justify-center">
-                         <div className="bg-background/80 backdrop-blur text-foreground text-xs font-semibold px-3 py-1.5 rounded-full opacity-0 group-hover/image:opacity-100 transform translate-y-2 group-hover/image:translate-y-0 transition-all duration-300 shadow-sm border border-border/50">
-                           View Document
-                         </div>
-                      </div>
-                      <img 
-                        src={getPublicUrl('portfolio-assets', cert.certificate_image_path)} 
-                        loading="lazy" 
-                        alt={`${cert.title} Document`}
-                        className="w-full h-full object-cover opacity-80 group-hover/image:opacity-100 transition-all duration-500 scale-100 group-hover/image:scale-105"
-                      />
-                    </a>
+                {hasImage ? (
+                  <>
+                    <img 
+                      src={getPublicUrl('portfolio-assets', cert.certificate_image_path!)} 
+                      alt={cert.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="px-4 py-2 bg-black/60 backdrop-blur-md rounded-full text-xs font-bold text-white flex items-center gap-2">
+                        View Credential <ExternalLink className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-2 opacity-50">
+                    <Award className="w-8 h-8 text-text-muted" />
+                    <span className="text-[10px] font-mono tracking-widest uppercase">Verified Record</span>
                   </div>
                 )}
+              </div>
 
-                {/* Content Area */}
-                <div className="p-5 md:p-6 flex-1 flex flex-col justify-between relative">
-                  {/* Subtle Background Glow */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-accent/0 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-                  <div className="relative z-10 flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
-                    {/* Trust Anchor: Issuer Logo + Verified Seal */}
-                    <div className="relative flex-shrink-0 mb-2 sm:mb-0">
-                      <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-surface border border-border/60 flex items-center justify-center p-2.5 shadow-sm group-hover:border-accent/30 transition-colors">
-                        {cert.issuer_logo_path ? (
-                          <img 
-                            src={getPublicUrl('portfolio-assets', cert.issuer_logo_path)} 
-                            alt={cert.issuer_name}
-                            loading="lazy"
-                            className="w-full h-full object-contain filter group-hover:brightness-110 transition-all"
-                          />
-                        ) : (
-                          <Award className="w-8 h-8 text-muted-foreground/50 group-hover:text-accent/70 transition-colors" />
-                        )}
-                      </div>
-                      {/* Premium Verified Seal */}
-                      <div className="absolute -bottom-2 -right-2 bg-background rounded-full p-0.5 shadow-sm border border-border/30">
-                        <BadgeCheck className="w-6 h-6 text-accent fill-accent/10" />
-                      </div>
-                    </div>
-                    
-                    {/* Header Text */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-display font-bold text-lg md:text-xl text-foreground leading-tight group-hover:text-accent transition-colors duration-300">
-                        {cert.title}
-                      </h3>
-                      <div className="text-foreground/80 font-semibold text-sm mt-1.5">
-                        {cert.issuer_name}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Metadata & Actions */}
-                  <div className="relative z-10 space-y-5">
-                    {/* Secure Metadata Tokens */}
-                    <div className="flex flex-wrap items-center gap-3 text-xs">
-                      <div className="flex items-center gap-1.5 text-muted-foreground bg-muted/30 px-2.5 py-1 rounded-md border border-border/30">
-                        <Calendar className="w-3.5 h-3.5 opacity-70" />
-                        <span>Issued: {formattedDate}</span>
-                      </div>
-                      {cert.credential_id && (
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 bg-muted/40 rounded-md border border-border/50 text-muted-foreground font-mono font-medium tracking-wide">
-                          <Shield className="w-3.5 h-3.5 text-accent/70" />
-                          <span>ID: {cert.credential_id}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Verification CTA */}
-                    {cert.verification_url && (
-                      <div className="pt-2 border-t border-border/30">
-                        <a 
-                          href={cert.verification_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center text-sm font-semibold text-accent hover:text-accent/80 transition-colors group/link"
-                        >
-                          Verify Credential 
-                          <ArrowRight className="w-4 h-4 ml-1.5 opacity-60 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all duration-300" />
-                        </a>
-                      </div>
+              {/* Meta Area */}
+              <div className="p-5 flex flex-col gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded bg-white flex items-center justify-center shrink-0 overflow-hidden border border-bg-border">
+                    {logoUrl ? (
+                      <img src={logoUrl} alt={cert.issuer_name} className="w-full h-full object-contain p-1" />
+                    ) : (
+                      <Award className="w-4 h-4 text-black" />
                     )}
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-bold text-primary truncate leading-tight" title={cert.title}>{cert.title}</h3>
+                    <p className="text-xs text-text-secondary mt-1">{cert.issuer_name}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-auto">
+                  <span className="text-[10px] font-mono font-bold text-text-muted uppercase tracking-widest bg-bg-elevated px-2 py-1 rounded">
+                    {year}
+                  </span>
+                  {cert.verification_url && (
+                    <a 
+                      href={cert.verification_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-bold text-accent-primary hover:text-accent-primary-dark transition-colors flex items-center gap-1"
+                    >
+                      Verify <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
                 </div>
               </div>
-            )
+            </motion.div>
+          )
         })}
       </div>
+
+      {/* Modal for full credential viewing */}
+      <AnimatePresence>
+        {selectedCert && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-xl"
+            onClick={() => setSelectedCert(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative max-w-5xl w-full bg-bg-surface border border-bg-border rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-full"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between p-4 border-b border-bg-border bg-bg-elevated/50 shrink-0">
+                <div className="flex items-center gap-3">
+                  <Award className="w-5 h-5 text-accent-primary shrink-0" />
+                  <h3 className="font-bold text-primary truncate">{selectedCert.title}</h3>
+                </div>
+                <button 
+                  onClick={() => setSelectedCert(null)}
+                  className="p-2 rounded-full hover:bg-white/10 transition-colors shrink-0 ml-2"
+                >
+                  <X className="w-5 h-5 text-text-secondary" />
+                </button>
+              </div>
+              
+              <div className="p-4 md:p-10 overflow-y-auto flex-1 flex items-center justify-center bg-black/40 min-h-0">
+                <img 
+                  src={getPublicUrl('portfolio-assets', selectedCert.certificate_image_path)} 
+                  alt={selectedCert.title}
+                  className="max-w-full max-h-[50vh] md:max-h-[70vh] object-contain rounded shadow-lg border border-white/10"
+                />
+              </div>
+
+              <div className="p-4 border-t border-bg-border bg-bg-elevated/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
+                <span className="text-sm text-text-secondary font-medium">Issued by {selectedCert.issuer_name}</span>
+                {selectedCert.verification_url && (
+                  <Button asChild size="sm" className="w-full sm:w-auto bg-accent-primary text-black font-bold hover:bg-accent-primary-dark">
+                    <a href={selectedCert.verification_url} target="_blank" rel="noopener noreferrer">
+                      Verify Authenticity <ExternalLink className="w-4 h-4 ml-2" />
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AnimatedSection>
   )
 }

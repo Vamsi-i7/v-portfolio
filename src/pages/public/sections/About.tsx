@@ -1,95 +1,93 @@
 import { useSettings } from '@/hooks/queries/useSettings'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
-import { Button } from '@/components/ui/button'
-import { FileText, User } from 'lucide-react'
 import { getPublicUrl } from '@/lib/storage'
-import { trackEvent } from '@/lib/analytics'
+import { motion } from 'framer-motion'
 
 export function About() {
   const { data: settings, isLoading } = useSettings()
 
-  if (isLoading) {
-    return (
-      <AnimatedSection id="about" className="section-container">
-        <div className="animate-pulse flex flex-col md:flex-row gap-12 items-center">
-          <div className="w-48 h-48 rounded-full bg-muted flex-shrink-0" />
-          <div className="space-y-4 w-full">
-            <div className="h-8 bg-muted rounded w-1/4" />
-            <div className="h-4 bg-muted rounded w-full" />
-            <div className="h-4 bg-muted rounded w-5/6" />
-            <div className="h-4 bg-muted rounded w-4/6" />
-          </div>
-        </div>
-      </AnimatedSection>
-    )
-  }
+  if (isLoading) return null
+
+  const profileImageUrl = settings?.profile_image_path 
+    ? getPublicUrl('portfolio-assets', settings.profile_image_path)
+    : null
 
   return (
-    <AnimatedSection id="about" className="section-container py-16 md:py-24" aria-labelledby="about-title">
-      <div className="flex flex-col md:flex-row gap-12 items-center md:items-start">
-        
-        {/* Profile Image Column */}
-        <div className="flex-shrink-0 relative">
-          <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-bg-surface shadow-xl relative z-10 bg-muted flex items-center justify-center">
-            {settings?.profile_image_path ? (
+    <AnimatedSection id="about" className="section-container relative" aria-labelledby="about-title">
+      <div className="mb-16">
+        <span className="section-label">Identity</span>
+        <h2 id="about-title" className="text-section font-display font-bold tracking-tight mt-2">
+          Behind The Code
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        {/* LEFT: IMAGE */}
+        <div className="lg:col-span-5 order-2 lg:order-1">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, rotate: -2 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="relative aspect-[4/5] max-w-sm mx-auto w-full rounded-2xl overflow-hidden border border-bg-border shadow-2xl bg-bg-surface"
+          >
+            {profileImageUrl ? (
               <img 
-                src={getPublicUrl('portfolio-assets', settings.profile_image_path)} 
-                alt={settings.full_name || 'Profile'} 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // Fallback if image fails to load
-                  (e.target as HTMLImageElement).style.display = 'none';
-                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                }}
+                src={profileImageUrl} 
+                alt={settings?.full_name || 'Profile'} 
+                className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-700"
               />
-            ) : null}
-            {/* Fallback Icon */}
-            <User className={`w-20 h-20 text-muted-foreground ${settings?.profile_image_path ? 'hidden absolute' : ''}`} />
-          </div>
-          {/* Decorative background blur */}
-          <div className="absolute inset-0 bg-accent/20 blur-3xl rounded-full -z-10 transform scale-110" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-surface">
+                <span className="text-text-muted/40 font-mono tracking-widest uppercase font-bold text-sm">Image Pending</span>
+              </div>
+            )}
+            
+            {/* Corner accents */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-accent-primary opacity-50 m-4 rounded-tl-lg" />
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-accent-primary opacity-50 m-4 rounded-br-lg" />
+          </motion.div>
         </div>
 
-        {/* Bio Column */}
-        <div className="flex-1 space-y-6">
-          <div>
-            <span className="section-label mb-2">About Me</span>
-            <h2 id="about-title" className="text-section font-display font-bold tracking-tight">
-              Behind the Code
-            </h2>
-          </div>
+        {/* RIGHT: PERSONAL STATEMENT */}
+        <div className="lg:col-span-7 order-1 lg:order-2">
+          <div className="space-y-8">
+            <p className="text-xl md:text-2xl text-text-primary leading-relaxed font-medium">
+              {settings?.bio || "I build high-performance web applications and autonomous AI agents with a focus on engineering excellence and product-led growth."}
+            </p>
+            
+            <div className="h-px w-16 bg-accent-primary/40" />
 
-          <div className="text-muted-foreground text-lg leading-relaxed space-y-4">
-            {settings?.bio ? (
-              // Splitting by double newline to support basic paragraphs if stored that way
-              settings.bio.split('\n\n').map((paragraph, idx) => (
-                <p key={idx}>{paragraph}</p>
-              ))
-            ) : (
-              <p>
-                I am a passionate developer dedicated to building impactful, high-performance web applications.
-                I thrive on solving complex problems and continuously learning new technologies.
-              </p>
-            )}
-          </div>
-
-          {settings?.resume_path && (
-            <div className="pt-4">
-              <Button asChild variant="outline" className="btn-ghost">
-                <a 
-                  href={getPublicUrl('portfolio-assets', settings.resume_path)} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  onClick={() => trackEvent('resume_download', { source: 'about' })}
-                >
-                  <FileText className="w-4 h-4 mr-2" />
-                  View Resume
-                </a>
-              </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4">
+              <PrincipleItem 
+                title="Systems over shortcuts" 
+                desc="I favor scalable architectures and reusable patterns over quick-fix solutions that incur technical debt." 
+              />
+              <PrincipleItem 
+                title="Build for scale" 
+                desc="Every line of code is written with the assumption of 100x current load, ensuring long-term resilience." 
+              />
+              <PrincipleItem 
+                title="Measure then optimize" 
+                desc="Decisions are driven by data. I profile and benchmark systems before diving into performance tuning." 
+              />
+              <PrincipleItem 
+                title="Learn by shipping" 
+                desc="I believe in rapid iteration and real-world feedback over premature perfection in a sandbox." 
+              />
             </div>
-          )}
+          </div>
         </div>
       </div>
     </AnimatedSection>
+  )
+}
+
+function PrincipleItem({ title, desc }: { title: string, desc: string }) {
+  return (
+    <div className="space-y-2">
+      <h4 className="text-sm font-bold text-primary uppercase tracking-wider">{title}</h4>
+      <p className="text-[13px] text-text-secondary leading-relaxed">{desc}</p>
+    </div>
   )
 }

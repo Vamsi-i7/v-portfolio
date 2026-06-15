@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useSettings } from '@/hooks/queries/useSettings'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
+import { MagneticButton } from '@/components/ui-custom/MagneticButton'
 import { Button } from '@/components/ui/button'
-import { Mail, MapPin, Send, Loader2 } from 'lucide-react'
+import { Send, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
 import { trackEvent } from '@/lib/analytics'
@@ -10,7 +11,7 @@ import { trackEvent } from '@/lib/analytics'
 export function Contact() {
   const { data: settings } = useSettings()
   const { toast } = useToast()
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
@@ -21,6 +22,8 @@ export function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (isSubmitting) return
+    
     setIsSubmitting(true)
 
     try {
@@ -35,20 +38,20 @@ export function Contact() {
         title: 'Message Sent',
         description: "Thank you for reaching out! I'll get back to you soon.",
       })
-      
+
       trackEvent('contact_submit', { status: 'success' })
 
       // Reset form on success
       setFormData({ name: '', email: '', message: '', website: '' })
     } catch (error: unknown) {
       console.error('Contact form error:', error)
-      
+
       toast({
         variant: 'destructive',
         title: 'Send Failed',
         description: 'There was an issue sending your message. Opening your email client instead...',
       })
-      
+
       trackEvent('contact_submit', { status: 'fallback' })
 
       // Fallback to mailto
@@ -68,116 +71,111 @@ export function Contact() {
   }
 
   return (
-    <AnimatedSection id="contact" className="section-container py-16 md:py-24" aria-labelledby="contact-title">
-      <div className="mb-10 md:mb-16 max-w-2xl mx-auto text-center">
-        <span className="section-label mb-2 justify-center">Get In Touch</span>
-        <h2 id="contact-title" className="text-section font-display font-bold tracking-tight mb-4">
-          Let's Build Something Together
+    <AnimatedSection id="contact" className="section-container relative" aria-labelledby="contact-title">
+      <div className="mb-16">
+        <span className="section-label">Connect</span>
+        <h2 id="contact-title" className="text-section font-display font-bold tracking-tight mt-2">
+          Let's ship something.
         </h2>
-        <p className="text-muted-foreground text-lg">
-          Whether you have a question, a project idea, or just want to say hi, my inbox is always open.
-        </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto items-start">
-        {/* Contact Info */}
-        <div className="space-y-8">
-          {settings?.email && (
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                <Mail className="w-6 h-6 text-accent" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Email</h3>
-                <a href={`mailto:${settings.email}`} className="text-muted-foreground hover:text-accent transition-colors">
-                  {settings.email}
-                </a>
-              </div>
+      <div className="contact-grid-premium">
+        
+        {/* LEFT: PITCH & SOCIAL (60%) */}
+        <div className="flex flex-col justify-between py-2">
+          <div className="max-w-md space-y-10">
+            <p className="text-2xl font-medium text-text-secondary leading-tight">
+              Have a high-impact project in mind? I'm currently open to selective engineering roles and high-stakes consulting.
+            </p>
+            
+            <div className="flex flex-col gap-6">
+               <p className="text-xl font-bold text-primary">
+                 Use the secure form to reach my private inbox directly.
+               </p>
             </div>
-          )}
+          </div>
 
-          {settings?.location && (
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-                <MapPin className="w-6 h-6 text-accent" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Location</h3>
-                <span className="text-muted-foreground">
-                  {settings.location}
-                </span>
-              </div>
-            </div>
-          )}
+          <div className="mt-16 lg:mt-0 space-y-1">
+            <div className="text-[10px] font-mono font-bold text-text-muted uppercase tracking-[0.3em] mb-2">Based In</div>
+            <div className="text-base font-bold text-primary">{settings?.location || 'Global / Remote'}</div>
+          </div>
         </div>
 
-        {/* Contact Form */}
-        <div className="card-elevated">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Honeypot field - hidden from users and screen readers */}
-            <div className="hidden" aria-hidden="true">
-              <input 
-                id="website" 
-                type="text" 
-                value={formData.website} 
-                onChange={handleChange} 
-                tabIndex={-1} 
-                autoComplete="off" 
-              />
-            </div>
+        {/* RIGHT: MINIMAL FORM (40%) */}
+        <form onSubmit={handleSubmit} className="contact-form-premium" noValidate>
+          <div className="hidden" aria-hidden="true">
+            <input 
+              id="website" 
+              type="text" 
+              value={formData.website} 
+              onChange={handleChange} 
+              tabIndex={-1} 
+              autoComplete="off" 
+            />
+          </div>
 
-            <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium">Name</label>
-              <input 
-                id="name" 
-                type="text" 
-                required 
-                value={formData.name}
-                onChange={handleChange}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
-                placeholder="John Doe" 
-              />
-            </div>
+          <div className="space-y-1">
+            <label htmlFor="name" className="contact-label-minimal">Name</label>
+            <input
+              id="name"
+              type="text"
+              required
+              value={formData.name}
+              onChange={handleChange}
+              className="contact-input-minimal"
+              placeholder="What should I call you?"
+              autoComplete="name"
+            />
+          </div>
 
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">Email</label>
-              <input 
-                id="email" 
-                type="email" 
-                required 
-                value={formData.email}
-                onChange={handleChange}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
-                placeholder="john@example.com" 
-              />
-            </div>
+          <div className="space-y-1">
+            <label htmlFor="email" className="contact-label-minimal">Email Address</label>
+            <input
+              id="email"
+              type="email"
+              required
+              value={formData.email}
+              onChange={handleChange}
+              className="contact-input-minimal"
+              placeholder="Where should I reply?"
+              autoComplete="email"
+            />
+          </div>
 
-            <div className="space-y-2">
-              <label htmlFor="message" className="text-sm font-medium">Message</label>
-              <textarea 
-                id="message" 
-                required 
-                rows={4} 
-                value={formData.message}
-                onChange={handleChange}
-                className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" 
-                placeholder="Hello..." 
-              />
-            </div>
+          <div className="space-y-1">
+            <label htmlFor="message" className="contact-label-minimal">Project Details</label>
+            <textarea
+              id="message"
+              required
+              rows={4}
+              value={formData.message}
+              onChange={handleChange}
+              className="contact-input-minimal resize-none"
+              placeholder="Tell me about your project, timeline, and goals..."
+            />
+          </div>
 
-            <Button type="submit" className="w-full btn-accent" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4 mr-2" /> Send Message
-                </>
-              )}
-            </Button>
-          </form>
-        </div>
+          <div className="pt-6">
+            <MagneticButton strength={15}>
+              <Button
+                id="contact-submit-btn"
+                type="submit"
+                disabled={isSubmitting}
+                className="h-16 px-12 bg-accent-primary text-black font-bold text-lg hover:bg-accent-primary-dark rounded-full shadow-[0_0_30px_rgba(255,149,0,0.15)] group transition-all"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  <>
+                    Send Message
+                    <Send className="ml-4 w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  </>
+                )}
+              </Button>
+            </MagneticButton>
+          </div>
+        </form>
+
       </div>
     </AnimatedSection>
   )

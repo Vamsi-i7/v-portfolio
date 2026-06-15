@@ -2,34 +2,34 @@ import { Home, Briefcase, FolderGit2, Map, Mail } from 'lucide-react'
 
 const MOBILE_NAV_LINKS = [
   { href: '#home', label: 'Home', icon: Home },
-  { href: '#experience', label: 'Exp', icon: Briefcase },
   { href: '#projects', label: 'Work', icon: FolderGit2 },
-  { href: '#journey', label: 'Journey', icon: Map },
-  { href: '#contact', label: 'Contact', icon: Mail },
+  { href: '#experience', label: 'Exp', icon: Briefcase },
+  { href: '#about', label: 'About', icon: Map },
+  { href: '#contact', label: 'Talk', icon: Mail },
 ]
 
 export function MobileNav() {
   return (
-    <nav 
-      role="navigation" 
-      aria-label="Mobile Navigation" 
-      className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-border/40 md:hidden pb-safe"
-    >
-      <div className="flex items-center justify-around px-2 py-3">
+    <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center md:hidden px-4 sm:px-8 pointer-events-none">
+      <nav 
+        role="navigation" 
+        aria-label="Mobile Navigation" 
+        className="bg-bg-surface/80 backdrop-blur-xl border border-white/5 rounded-full px-6 sm:px-8 py-3.5 flex items-center justify-between sm:justify-center gap-6 sm:gap-10 w-full max-w-sm shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto"
+      >
         {MOBILE_NAV_LINKS.map((link) => {
           const Icon = link.icon
           return (
             <a
               key={link.href}
               href={link.href}
-              className="flex flex-col items-center justify-center w-16 gap-1 text-muted-foreground transition-colors hover:text-primary active:scale-95 focus-visible:text-primary"
+              className="text-text-secondary transition-all hover:text-accent-primary active:scale-75"
+              aria-label={link.label}
             >
-              <Icon className="w-5 h-5" strokeWidth={2} />
-              <span className="text-[10px] font-medium tracking-wide">{link.label}</span>
+              <Icon className="w-5 h-5" strokeWidth={2.5} />
             </a>
           )
         })}
-      </div>
-    </nav>
+      </nav>
+    </div>
   )
 }
