@@ -18,6 +18,7 @@ dist-ssr
 .env.production
 IMPLEMENTATION_PLAN.md
 PRD.md
+portfolio_design_audit.md
 
 
 # Bundle visualizer output

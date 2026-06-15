@@ -1,6 +1,5 @@
 import { useSettings } from '@/hooks/queries/useSettings'
-import { ArrowUp, Mail } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ArrowUp } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
 
 export function Footer() {
@@ -9,85 +8,76 @@ export function Footer() {
   const socialLinks = settings?.social_links as Record<string, string> | null
   const currentYear = new Date().getFullYear()
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
+
+  const ensureHttps = (url: string) => {
+    if (!url) return '#'
+    return url.startsWith('http') ? url : `https://${url}`
   }
 
   return (
-    <footer role="contentinfo" className="border-t border-border/40 bg-surface pb-20 md:pb-0">
-      <div className="container mx-auto px-6 py-12">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          
-          {/* Brand & Copyright */}
-          <div className="flex flex-col items-center md:items-start gap-2">
-            <span className="font-display font-bold text-xl tracking-tight text-foreground">
-              {settings?.site_title || 'V Portfolio'}
+    <footer role="contentinfo" className="py-16 border-t border-white/5 bg-bg-base/60 backdrop-blur-md pb-32 md:pb-16 relative z-10">
+      <div className="section-container flex flex-col md:flex-row items-center justify-between gap-10">
+        
+        <div className="flex flex-col items-center md:items-start gap-2">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent-primary" />
+            <span className="text-sm font-black uppercase tracking-[0.2em] text-text-primary">
+              {settings?.full_name || 'Vamsi Krishna'}
             </span>
-            <p className="text-sm text-muted-foreground">
-              &copy; {currentYear} {settings?.full_name || 'Vamsi'}. All rights reserved.
-            </p>
           </div>
+          <span className="text-[10px] font-mono font-bold text-text-muted uppercase tracking-widest">
+            © {currentYear} · Engineered to Scale
+          </span>
+        </div>
 
-          {/* Social Links */}
-          <div className="flex items-center gap-4">
+        <div className="flex items-center gap-10">
+          <div className="flex items-center gap-6">
             {socialLinks?.github && (
-              <a 
-                href={socialLinks.github} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                aria-label="GitHub" 
-                className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted flex items-center justify-center"
+              <a
+                href={ensureHttps(socialLinks.github)}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                className="text-text-muted hover:text-accent-primary transition-all hover:scale-110 text-xl"
                 onClick={() => trackEvent('social_click', { platform: 'github' })}
               >
-                <i className="devicon-github-original text-xl" />
+                <i className="devicon-github-original" />
               </a>
             )}
             {socialLinks?.linkedin && (
-              <a 
-                href={socialLinks.linkedin} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                aria-label="LinkedIn" 
-                className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted flex items-center justify-center"
+              <a
+                href={ensureHttps(socialLinks.linkedin)}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="text-text-muted hover:text-accent-primary transition-all hover:scale-110 text-xl"
                 onClick={() => trackEvent('social_click', { platform: 'linkedin' })}
               >
-                <i className="devicon-linkedin-plain text-xl" />
+                <i className="devicon-linkedin-plain" />
               </a>
             )}
             {socialLinks?.twitter && (
-              <a 
-                href={socialLinks.twitter} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                aria-label="Twitter" 
-                className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted flex items-center justify-center"
+              <a
+                href={ensureHttps(socialLinks.twitter)}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Twitter"
+                className="text-text-muted hover:text-accent-primary transition-all hover:scale-110 text-xl"
                 onClick={() => trackEvent('social_click', { platform: 'twitter' })}
               >
-                <i className="devicon-twitter-original text-xl" />
-              </a>
-            )}
-            {settings?.email && (
-              <a 
-                href={`mailto:${settings.email}`} 
-                aria-label="Email" 
-                className="text-muted-foreground hover:text-foreground transition-colors p-2 bg-muted/50 rounded-md hover:bg-muted md:hidden flex items-center justify-center"
-                onClick={() => trackEvent('social_click', { platform: 'email' })}
-              >
-                <Mail className="w-5 h-5" />
+                <i className="devicon-twitter-original" />
               </a>
             )}
           </div>
 
-          {/* Back to Top */}
-          <Button 
-            variant="ghost" 
-            size="sm" 
+          <button
             onClick={scrollToTop}
-            className="text-muted-foreground hover:text-foreground"
+            className="hidden md:flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-text-muted hover:text-primary transition-colors group"
+            aria-label="Back to top"
           >
-            Back to Top <ArrowUp className="ml-2 w-4 h-4" />
-          </Button>
-
+            Top <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-1 transition-transform" />
+          </button>
         </div>
       </div>
     </footer>

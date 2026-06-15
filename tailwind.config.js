@@ -53,8 +53,8 @@ export default {
         'text-primary':     'var(--text-primary)',
         'text-secondary':   'var(--text-secondary)',
         'text-muted':       'var(--text-muted)',
-        'accent-blue':      'var(--accent-blue)',
-        'accent-blue-dark': 'var(--accent-blue-dark)',
+        'accent-primary':   'var(--accent-primary)',
+        'accent-primary-dark': 'var(--accent-primary-dark)',
         'accent-glow':      'var(--accent-glow)',
       },
 
@@ -62,27 +62,34 @@ export default {
       fontFamily: {
         display: ['Inter', 'system-ui', 'sans-serif'],
         body:    ['Inter', 'system-ui', 'sans-serif'],
-        mono:    ['JetBrains Mono', 'Fira Code', 'ui-monospace', 'monospace'],
+        mono:    ['JetBrains Mono', 'monospace'],
       },
       fontSize: {
-        // Hero headline — clamp(48px, 7vw, 80px) handled inline for fluid sizing
-        'hero':         ['clamp(3rem, 7vw, 5rem)', { lineHeight: '1.15', fontWeight: '800', letterSpacing: '-0.03em' }],
-        // Section headings — clamp(32px, 5vw, 56px)
-        'section':      ['clamp(2rem, 5vw, 3.5rem)', { lineHeight: '1.15', fontWeight: '700', letterSpacing: '-0.02em' }],
+        // Display
+        'display':      ['clamp(3rem, 12vw, 7rem)', { lineHeight: '1', fontWeight: '800', letterSpacing: '-0.04em' }],
+        // Hero headline
+        'hero':         ['clamp(2rem, 8vw, 3.5rem)', { lineHeight: '1.05', fontWeight: '800', letterSpacing: '-0.03em' }],
+        // Section headings
+        'section':      ['clamp(2.5rem, 5vw, 3.5rem)', { lineHeight: '1.1', fontWeight: '700', letterSpacing: '-0.025em' }],
+        // H2
+        'h2':           ['clamp(1.5rem, 3vw, 2rem)', { lineHeight: '1.2', fontWeight: '600', letterSpacing: '-0.015em' }],
         // Card titles
-        'card-title':   ['clamp(1.25rem, 2vw, 1.5rem)', { lineHeight: '1.35', fontWeight: '600' }],
+        'card-title':   ['1.25rem', { lineHeight: '1.3', fontWeight: '600' }],
         // Body copy
-        'body':         ['clamp(1rem, 1.5vw, 1.125rem)', { lineHeight: '1.65', fontWeight: '400' }],
+        'body':         ['1rem', { lineHeight: '1.65', fontWeight: '400' }],
         // Small labels, tags, metadata
-        'small':        ['0.875rem', { lineHeight: '1.5', fontWeight: '400', letterSpacing: '0.01em' }],
+        'small':        ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }],
+        // Caption
+        'caption':      ['0.75rem', { lineHeight: '1.5', fontWeight: '500', letterSpacing: '0.02em' }],
         // Monospace stats, code
-        'mono':         ['0.875rem', { lineHeight: '1.6', fontWeight: '500' }],
+        'mono':         ['0.875rem', { lineHeight: '1.5', fontWeight: '500' }],
       },
       lineHeight: {
-        tight: '1.15',
+        tight: '1.1',
         body:  '1.65',
       },
       letterSpacing: {
+        tightest: '-0.04em',
         tight: '-0.03em',
         wide:  '0.08em',
       },
@@ -91,21 +98,22 @@ export default {
       spacing: {
         '1':  '4px',
         '2':  '8px',
-        '3':  '16px',
-        '4':  '24px',
-        '5':  '32px',
-        '6':  '48px',
-        '7':  '64px',
-        '8':  '96px',
-        '9':  '128px',
-        '10': '192px',
+        '3':  '12px',
+        '4':  '16px',
+        '5':  '24px',
+        '6':  '32px',
+        '7':  '48px',
+        '8':  '64px',
+        '9':  '96px',
+        '10': '128px',
+        '11': '160px',
       },
 
       // ─── Border Radius (PRD §5.6) ──────────────────────────────────────────
       borderRadius: {
-        'sm':   '6px',
-        'md':   '12px',
-        'lg':   '20px',
+        'sm':   '4px',
+        'md':   '8px',
+        'lg':   '16px',
         'full': '9999px',
         // shadcn/ui uses --radius CSS variable; we keep that working too
         DEFAULT: 'var(--radius)',
@@ -113,16 +121,16 @@ export default {
 
       // ─── Max Width ─────────────────────────────────────────────────────────
       maxWidth: {
-        content:  '1200px',
-        hero:     '900px',
-        subcopy:  '560px',
+        content:  '1120px',
+        hero:     '800px',
+        subcopy:  '500px',
       },
 
       // ─── Box Shadows (PRD §5.6) ────────────────────────────────────────────
       boxShadow: {
         'card':     '0 1px 2px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3)',
         'card-hover': '0 1px 2px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.4)',
-        'glow-blue': '0 0 0 1px rgba(59,130,246,0.3), 0 4px 24px rgba(59,130,246,0.15)',
+        'glow-amber': '0 0 0 1px rgba(255,149,0,0.3), 0 4px 24px rgba(255,149,0,0.15)',
       },
 
       // ─── Animation (PRD §5.5) ──────────────────────────────────────────────
