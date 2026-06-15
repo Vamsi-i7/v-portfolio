@@ -15,7 +15,7 @@ export function Navbar() {
 
   return (
     <header role="banner" className="fixed top-0 left-0 right-0 z-50 h-20 glass-card border-b border-white/5 hidden md:flex items-center">
-      <div className="section-container h-full flex items-center justify-between">
+      <div className="section-container w-full h-full flex items-center justify-between">
         
         {/* Logo / Brand */}
         <a 

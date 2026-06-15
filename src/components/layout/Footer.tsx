@@ -10,9 +10,17 @@ export function Footer() {
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
-  const ensureHttps = (url: string) => {
-    if (!url) return '#'
-    return url.startsWith('http') ? url : `https://${url}`
+  const getSocialUrl = (platform: string, value: string) => {
+    if (!value) return '#'
+    if (value.startsWith('http')) return value
+    if (value.includes('.com')) return `https://${value}`
+    
+    switch (platform) {
+      case 'github': return `https://github.com/${value}`
+      case 'linkedin': return `https://linkedin.com/in/${value}`
+      case 'twitter': return `https://twitter.com/${value}`
+      default: return `https://${value}`
+    }
   }
 
   return (
@@ -35,7 +43,7 @@ export function Footer() {
           <div className="flex items-center gap-6">
             {socialLinks?.github && (
               <a
-                href={ensureHttps(socialLinks.github)}
+                href={getSocialUrl('github', socialLinks.github)}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
@@ -47,7 +55,7 @@ export function Footer() {
             )}
             {socialLinks?.linkedin && (
               <a
-                href={ensureHttps(socialLinks.linkedin)}
+                href={getSocialUrl('linkedin', socialLinks.linkedin)}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
@@ -59,7 +67,7 @@ export function Footer() {
             )}
             {socialLinks?.twitter && (
               <a
-                href={ensureHttps(socialLinks.twitter)}
+                href={getSocialUrl('twitter', socialLinks.twitter)}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Twitter"
