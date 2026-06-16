@@ -29,10 +29,10 @@ export const AnimatedSection = forwardRef<HTMLElement, AnimatedSectionProps>(({
       onMouseMove={onMouseMove}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: viewportMargin }}
+      viewport={{ once: false, margin: viewportMargin }}
       transition={{ 
         duration: 0.6, // Matches --duration-enter (600ms) from tokens
-        ease: [0.16, 1, 0.3, 1] as any // Matches --ease-out from tokens
+        ease: [0.16, 1, 0.3, 1] as [number, number, number, number] // Matches --ease-out from tokens
       }}
     >
       {children}

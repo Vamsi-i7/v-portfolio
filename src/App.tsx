@@ -1,31 +1,36 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { HelmetProvider } from 'react-helmet-async'
 import { queryClient } from '@/lib/queryClient'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 import { Toaster } from '@/components/ui/toaster'
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
 import { AdminLayout } from '@/components/layout/AdminLayout'
-import { Login } from '@/pages/admin/Login'
-import { Dashboard } from '@/pages/admin/Dashboard'
-import { Settings } from '@/pages/admin/Settings'
-import { ProjectsList } from '@/pages/admin/Projects'
-import { ProjectForm } from '@/pages/admin/Projects/ProjectForm'
-import { ExperienceList } from '@/pages/admin/Experience'
-import { ExperienceForm } from '@/pages/admin/Experience/ExperienceForm'
-import { JourneyList } from '@/pages/admin/Journey'
-import { JourneyForm } from '@/pages/admin/Journey/JourneyForm'
-import { SkillsList } from '@/pages/admin/Skills'
-import { SkillForm } from '@/pages/admin/Skills/SkillForm'
-import { AchievementsList } from '@/pages/admin/Achievements'
-import { AchievementForm } from '@/pages/admin/Achievements/AchievementForm'
-import { CertificatesList } from '@/pages/admin/Certificates'
-import { CertificateForm } from '@/pages/admin/Certificates/CertificateForm'
-import { CodingProfilesPage } from '@/pages/admin/CodingProfiles'
 import { PublicLayout } from '@/components/layout/PublicLayout'
-import { Home } from '@/pages/public/Home'
 import { initAnalytics } from '@/lib/analytics'
+
+// Lazy Load Public Pages
+const Home = lazy(() => import('@/pages/public/Home').then(m => ({ default: m.Home })))
+
+// Lazy Load Admin Pages
+const Login = lazy(() => import('@/pages/admin/Login').then(m => ({ default: m.Login })))
+const Dashboard = lazy(() => import('@/pages/admin/Dashboard').then(m => ({ default: m.Dashboard })))
+const Settings = lazy(() => import('@/pages/admin/Settings').then(m => ({ default: m.Settings })))
+const ProjectsList = lazy(() => import('@/pages/admin/Projects').then(m => ({ default: m.ProjectsList })))
+const ProjectForm = lazy(() => import('@/pages/admin/Projects/ProjectForm').then(m => ({ default: m.ProjectForm })))
+const ExperienceList = lazy(() => import('@/pages/admin/Experience').then(m => ({ default: m.ExperienceList })))
+const ExperienceForm = lazy(() => import('@/pages/admin/Experience/ExperienceForm').then(m => ({ default: m.ExperienceForm })))
+const JourneyList = lazy(() => import('@/pages/admin/Journey').then(m => ({ default: m.JourneyList })))
+const JourneyForm = lazy(() => import('@/pages/admin/Journey/JourneyForm').then(m => ({ default: m.JourneyForm })))
+const SkillsList = lazy(() => import('@/pages/admin/Skills').then(m => ({ default: m.SkillsList })))
+const SkillForm = lazy(() => import('@/pages/admin/Skills/SkillForm').then(m => ({ default: m.SkillForm })))
+const AchievementsList = lazy(() => import('@/pages/admin/Achievements').then(m => ({ default: m.AchievementsList })))
+const AchievementForm = lazy(() => import('@/pages/admin/Achievements/AchievementForm').then(m => ({ default: m.AchievementForm })))
+const CertificatesList = lazy(() => import('@/pages/admin/Certificates').then(m => ({ default: m.CertificatesList })))
+const CertificateForm = lazy(() => import('@/pages/admin/Certificates/CertificateForm').then(m => ({ default: m.CertificateForm })))
+const CodingProfilesPage = lazy(() => import('@/pages/admin/CodingProfiles').then(m => ({ default: m.CodingProfilesPage })))
 
 /**
  * Component to handle analytics initialization
@@ -50,7 +55,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        element: (
+          <Suspense fallback={null}>
+            <Home />
+          </Suspense>
+        ),
       },
     ],
   },
@@ -59,7 +68,9 @@ const router = createBrowserRouter([
     element: (
       <>
         <AnalyticsTracker />
-        <Login />
+        <Suspense fallback={null}>
+          <Login />
+        </Suspense>
       </>
     ),
   },
@@ -77,87 +88,171 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Dashboard />,
+            element: (
+              <Suspense fallback={null}>
+                <Dashboard />
+              </Suspense>
+            ),
           },
           {
             path: 'settings',
-            element: <Settings />,
+            element: (
+              <Suspense fallback={null}>
+                <Settings />
+              </Suspense>
+            ),
           },
           {
             path: 'projects',
-            element: <ProjectsList />,
+            element: (
+              <Suspense fallback={null}>
+                <ProjectsList />
+              </Suspense>
+            ),
           },
           {
             path: 'projects/new',
-            element: <ProjectForm />,
+            element: (
+              <Suspense fallback={null}>
+                <ProjectForm />
+              </Suspense>
+            ),
           },
           {
             path: 'projects/:id',
-            element: <ProjectForm />,
+            element: (
+              <Suspense fallback={null}>
+                <ProjectForm />
+              </Suspense>
+            ),
           },
           {
             path: 'experience',
-            element: <ExperienceList />,
+            element: (
+              <Suspense fallback={null}>
+                <ExperienceList />
+              </Suspense>
+            ),
           },
           {
             path: 'experience/new',
-            element: <ExperienceForm />,
+            element: (
+              <Suspense fallback={null}>
+                <ExperienceForm />
+              </Suspense>
+            ),
           },
           {
             path: 'experience/:id',
-            element: <ExperienceForm />,
+            element: (
+              <Suspense fallback={null}>
+                <ExperienceForm />
+              </Suspense>
+            ),
           },
           {
             path: 'journey',
-            element: <JourneyList />,
+            element: (
+              <Suspense fallback={null}>
+                <JourneyList />
+              </Suspense>
+            ),
           },
           {
             path: 'journey/new',
-            element: <JourneyForm />,
+            element: (
+              <Suspense fallback={null}>
+                <JourneyForm />
+              </Suspense>
+            ),
           },
           {
             path: 'journey/:id/edit',
-            element: <JourneyForm />,
+            element: (
+              <Suspense fallback={null}>
+                <JourneyForm />
+              </Suspense>
+            ),
           },
           {
             path: 'skills',
-            element: <SkillsList />,
+            element: (
+              <Suspense fallback={null}>
+                <SkillsList />
+              </Suspense>
+            ),
           },
           {
             path: 'skills/new',
-            element: <SkillForm />,
+            element: (
+              <Suspense fallback={null}>
+                <SkillForm />
+              </Suspense>
+            ),
           },
           {
             path: 'skills/:id/edit',
-            element: <SkillForm />,
+            element: (
+              <Suspense fallback={null}>
+                <SkillForm />
+              </Suspense>
+            ),
           },
           {
             path: 'achievements',
-            element: <AchievementsList />,
+            element: (
+              <Suspense fallback={null}>
+                <AchievementsList />
+              </Suspense>
+            ),
           },
           {
             path: 'achievements/new',
-            element: <AchievementForm />,
+            element: (
+              <Suspense fallback={null}>
+                <AchievementForm />
+              </Suspense>
+            ),
           },
           {
             path: 'achievements/:id/edit',
-            element: <AchievementForm />,
+            element: (
+              <Suspense fallback={null}>
+                <AchievementForm />
+              </Suspense>
+            ),
           },
           {
             path: 'certificates',
-            element: <CertificatesList />,
+            element: (
+              <Suspense fallback={null}>
+                <CertificatesList />
+              </Suspense>
+            ),
           },
           {
             path: 'certificates/new',
-            element: <CertificateForm />,
+            element: (
+              <Suspense fallback={null}>
+                <CertificateForm />
+              </Suspense>
+            ),
           },
           {
             path: 'certificates/:id/edit',
-            element: <CertificateForm />,
+            element: (
+              <Suspense fallback={null}>
+                <CertificateForm />
+              </Suspense>
+            ),
           },
           {
             path: 'coding-profiles',
-            element: <CodingProfilesPage />,
+            element: (
+              <Suspense fallback={null}>
+                <CodingProfilesPage />
+              </Suspense>
+            ),
           },
         ],
       },
@@ -173,10 +268,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <HelmetProvider>
-        <AuthProvider>
-          <RouterProvider router={router} />
-          <Toaster />
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <RouterProvider router={router} />
+            <Toaster />
+          </AuthProvider>
+        </ThemeProvider>
       </HelmetProvider>
     </QueryClientProvider>
   )

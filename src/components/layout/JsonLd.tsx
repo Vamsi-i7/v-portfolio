@@ -26,7 +26,6 @@ export function JsonLd() {
     "jobTitle": settings.tagline || "Software Engineer",
     "url": siteUrl,
     "image": profileImageUrl || undefined,
-    "email": settings.email || undefined,
     "description": settings.meta_description || settings.bio || undefined,
     "sameAs": [
       socialLinks.github,

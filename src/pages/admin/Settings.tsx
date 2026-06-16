@@ -38,6 +38,22 @@ const settingsSchema = z.object({
     leetcode: z.string().optional().nullable(),
     codeforces: z.string().optional().nullable(),
   }).optional().nullable(),
+  about_philosophy: z.string().optional().nullable(),
+  about_principles: z.string().optional().nullable().refine(val => {
+    if (!val) return true;
+    try {
+      const parsed = JSON.parse(val);
+      return Array.isArray(parsed);
+    } catch {
+      return false;
+    }
+  }, 'Principles must be a valid JSON array of objects'),
+  availability_status: z.string().optional().nullable(),
+  contact_headline: z.string().optional().nullable(),
+  contact_description: z.string().optional().nullable(),
+  response_protocol: z.string().optional().nullable(),
+  footer_tagline: z.string().optional().nullable(),
+  copyright_text: z.string().optional().nullable(),
 })
 
 type SettingsFormValues = z.infer<typeof settingsSchema>
@@ -75,6 +91,14 @@ export function Settings() {
         leetcode: '',
         codeforces: '',
       },
+      about_philosophy: '',
+      about_principles: '[]',
+      availability_status: '',
+      contact_headline: '',
+      contact_description: '',
+      response_protocol: '',
+      footer_tagline: '',
+      copyright_text: '',
     },
   })
 
@@ -102,13 +126,27 @@ export function Settings() {
         resume_path: settings.resume_path || '',
         og_image_path: settings.og_image_path || '',
         social_links: validSocialLinks,
+        about_philosophy: settings.about_philosophy || '',
+        about_principles: settings.about_principles ? JSON.stringify(settings.about_principles, null, 2) : '[]',
+        availability_status: settings.availability_status || '',
+        contact_headline: settings.contact_headline || '',
+        contact_description: settings.contact_description || '',
+        response_protocol: settings.response_protocol || '',
+        footer_tagline: settings.footer_tagline || '',
+        copyright_text: settings.copyright_text || '',
       })
     }
   }, [settings, reset])
 
   const onSubmit = async (data: SettingsFormValues) => {
     try {
-      await saveSettings(data)
+      const parsedPrinciples = data.about_principles ? JSON.parse(data.about_principles) : []
+      
+      await saveSettings({
+        ...data,
+        about_principles: parsedPrinciples,
+      })
+      
       toast({
         title: 'Settings Saved',
         description: 'Your portfolio settings have been updated successfully.',
@@ -160,6 +198,7 @@ export function Settings() {
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="media">Media & Assets</TabsTrigger>
           <TabsTrigger value="social">Social Links</TabsTrigger>
+          <TabsTrigger value="copy">Landing Copy</TabsTrigger>
           <TabsTrigger value="seo">SEO & Meta</TabsTrigger>
         </TabsList>
 
@@ -295,6 +334,70 @@ export function Settings() {
                   onChange={(path) => setValue('og_image_path', path, { shouldDirty: true })}
                   onRemove={() => setValue('og_image_path', '', { shouldDirty: true })}
                 />
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* COPY TAB */}
+          <TabsContent value="copy" className="space-y-6">
+            <div className="card-elevated space-y-6">
+              <h2 className="text-lg font-bold tracking-tight text-white uppercase font-display border-b border-border pb-3">Section Headlines & Layout Copy</h2>
+              
+              <div className="space-y-2">
+                <Label htmlFor="about_philosophy">About: Philosophy Statement</Label>
+                <Input id="about_philosophy" {...register('about_philosophy')} placeholder="I believe in building systems that don't just work, but endure." />
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="availability_status">Contact: Availability Pill</Label>
+                  <Input id="availability_status" {...register('availability_status')} placeholder="Available for Q3 2026" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="response_protocol">Contact: Response Protocol</Label>
+                  <Input id="response_protocol" {...register('response_protocol')} placeholder="Under 12 Hours" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contact_headline">Contact: Headline Callout</Label>
+                <Input id="contact_headline" {...register('contact_headline')} placeholder="Looking for a staff-level partner to lead your next technical breakthrough?" />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contact_description">Contact: Sub-description Copy</Label>
+                <Textarea id="contact_description" rows={3} {...register('contact_description')} placeholder="Whether it's complex distributed systems, autonomous AI integration..." />
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="footer_tagline">Footer Tagline</Label>
+                  <Input id="footer_tagline" {...register('footer_tagline')} placeholder="Designing architectures. Engineering impact. Shipping excellence since 2020." />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="copyright_text">Footer Copyright Label</Label>
+                  <Input id="copyright_text" {...register('copyright_text')} placeholder="CORE.SYS OPERATING SYSTEM" />
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-4 border-t border-border">
+                <Label htmlFor="about_principles">About: Engineering Principles (JSON format)</Label>
+                <Textarea 
+                  id="about_principles" 
+                  rows={8} 
+                  className="font-mono text-xs bg-[#0b0b0f] text-white border border-border" 
+                  {...register('about_principles')} 
+                />
+                {errors.about_principles && (
+                  <p className="text-sm text-destructive">{errors.about_principles.message}</p>
+                )}
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  Provide a JSON array containing your four core values/principles. Schema: E.g.<br />
+                  <code className="bg-black/30 p-1 rounded font-mono text-[10px]">
+                    {"[ { \"title\": \"Predictive Scale\", \"desc\": \"...\", \"icon\": \"cpu\" } ]"}
+                  </code><br />
+                  Valid icon values: <code className="text-accent">cpu</code>, <code className="text-accent">box</code>, <code className="text-accent">layout</code>, <code className="text-accent">zap</code>, <code className="text-accent">shield</code>, <code className="text-accent">award</code>, <code className="text-accent">star</code>.
+                </p>
               </div>
             </div>
           </TabsContent>

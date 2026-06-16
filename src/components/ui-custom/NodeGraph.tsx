@@ -1,6 +1,20 @@
 import React, { useMemo, useRef } from 'react'
 import { motion, useSpring, useMotionValue, useTransform } from 'framer-motion'
 
+const NODE_COUNT = 24
+
+// Pre-generate static random node configuration outside component rendering to satisfy react-hooks/purity rules
+const staticNodes = Array.from({ length: NODE_COUNT }).map((_, i) => {
+  // Use a simple seed pseudo-random generator or Math.random() once on load
+  return {
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 3 + 1,
+    speed: Math.random() * 0.5 + 0.5
+  }
+})
+
 export function NodeGraph() {
   const containerRef = useRef<HTMLDivElement>(null)
   
@@ -25,16 +39,8 @@ export function NodeGraph() {
     mouseY.set(0)
   }
 
-  // Generate deterministic nodes
-  const nodes = useMemo(() => {
-    return Array.from({ length: 24 }).map((_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 3 + 1,
-      speed: Math.random() * 0.5 + 0.5
-    }))
-  }, [])
+  // Pure usage of pre-generated static nodes list
+  const nodes = staticNodes
 
   // Generate edges (connections)
   const edges = useMemo(() => {
@@ -73,7 +79,7 @@ export function NodeGraph() {
             <stop offset="100%" stopColor="var(--accent-primary-dark)" />
           </radialGradient>
         </defs>
-
+  
         {/* Edges */}
         {edges.map((edge, idx) => (
           <motion.line
@@ -90,7 +96,7 @@ export function NodeGraph() {
             transition={{ duration: 2, delay: idx * 0.01 }}
           />
         ))}
-
+  
         {/* Nodes */}
         {nodes.map((node) => (
           <motion.circle

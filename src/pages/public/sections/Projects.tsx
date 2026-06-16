@@ -1,244 +1,180 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo } from 'react'
 import { useProjects } from '@/hooks/queries/useProjects'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
-import { Code2, Image as ImageIcon, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react'
-import { getPublicUrl } from '@/lib/storage'
-import { trackEvent } from '@/lib/analytics'
+import { RevealText } from '@/components/ui-custom/RevealText'
+import { ProjectSpotlight } from '@/components/ui-custom/ProjectSpotlight'
+import { ProjectArchive } from '@/components/ui-custom/ProjectArchive'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronDown, ChevronUp, Layers, ArrowUpRight, GitBranch } from 'lucide-react'
 
 export function Projects() {
   const { data: projects, isLoading } = useProjects()
-  const [activeId, setActiveId] = useState<string | null>(null)
-  const [showAll, setShowAll] = useState(false)
-  const containerRef = useRef<HTMLElement>(null)
+  const [showArchive, setShowArchive] = useState(false)
+  const [activeSpotlightIndex, setActiveSpotlightIndex] = useState(0)
 
-  const activeProject = useMemo(() => {
-    if (!projects) return null
-    if (!activeId) return projects[0]
-    return projects.find(p => p.id === activeId) || projects[0]
-  }, [projects, activeId])
-
-  const selectorProjects = useMemo(() => {
-    if (!projects) return []
-    return projects.filter(p => p.id !== activeProject?.id).slice(0, 4)
-  }, [projects, activeProject])
-
-  const remainingProjects = useMemo(() => {
-    if (!projects) return []
-    return projects.filter(p => p.id !== activeProject?.id).slice(4)
-  }, [projects, activeProject])
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!containerRef.current) return
-    const rect = containerRef.current.getBoundingClientRect()
-    containerRef.current.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`)
-    containerRef.current.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`)
-  }
-
+  // Top 6 projects for the spotlight
+  const featuredProjects = useMemo(() => projects?.slice(0, 6) || [], [projects])
+  
   if (isLoading || !projects || projects.length === 0) return null
 
   return (
     <AnimatedSection 
       id="projects" 
-      ref={containerRef}
-      className="section-container relative spotlight-card" 
+      className="section-container relative py-20 overflow-hidden" 
       aria-labelledby="projects-title"
-      onMouseMove={handleMouseMove}
     >
-      <div className="mb-12">
-        <span className="section-label">Work</span>
-        <h2 id="projects-title" className="text-section font-display font-bold tracking-tight mt-2">
-          Featured Systems
-        </h2>
+      {/* Background Ambient Glow */}
+      <div className="absolute top-1/4 -right-20 w-96 h-96 bg-accent-primary/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="mb-12 relative z-10">
+        <span className="text-[10px] font-mono uppercase tracking-[0.5em] text-white/30 mb-4 block">Engineered Solutions</span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <RevealText text="Project Spotlight" className="text-5xl sm:text-7xl font-display font-black tracking-tightest text-white uppercase" />
+          <p className="max-w-md text-sm text-white/40 font-medium leading-relaxed">
+            A selection of my most impactful works, from complex distributed systems to refined user experiences.
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* ZONE A: CINEMATIC FEATURED PANEL (62%) */}
-        <div className="lg:col-span-8">
+      {/* Main Spotlight Gallery */}
+      <div className="relative z-10 mb-12">
+        <ProjectSpotlight 
+          projects={featuredProjects} 
+          onProjectChange={(index) => setActiveSpotlightIndex(index)}
+        />
+      </div>
+
+      {/* Synced "Deep Dive" Details Container - Strict fixed height wrapper to prevent any viewport height shifts */}
+      <div className="relative z-10 w-[85vw] md:w-full md:max-w-4xl mx-auto px-0 md:px-4 mb-20">
+        <motion.div 
+          className="bg-white/[0.02] border border-white/10 rounded-[2rem] p-6 sm:p-10 backdrop-blur-xl relative overflow-hidden group/details h-[500px] sm:h-[460px] md:h-[340px] flex flex-col justify-center"
+        >
           <AnimatePresence mode="wait">
-            <motion.div
-              key={activeProject?.id}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.02 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as any }}
-              className="relative aspect-square md:aspect-video rounded-xl overflow-hidden border border-bg-border shadow-2xl group cursor-pointer bg-bg-surface"
-            >
-              {/* Live Link Overlay - Placed at the back of the DOM so it doesn't steal button clicks */}
-              {activeProject?.demo_url && (
-                <a 
-                  href={activeProject.demo_url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="absolute inset-0 z-0 no-cursor"
-                  aria-label={`View live demo of ${activeProject.title}`}
-                  onClick={() => trackEvent('project_view_live', { title: activeProject.title })}
-                />
-              )}
-
-              {/* Image with Parallax-ready scale */}
-              {activeProject?.thumbnail_path ? (
-                <img 
-                  src={getPublicUrl('portfolio-assets', activeProject.thumbnail_path)}
-                  alt={activeProject.title}
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 pointer-events-none"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-bg-elevated to-bg-surface pointer-events-none">
-                  <ImageIcon className="w-12 h-12 text-text-muted/20" />
+            {featuredProjects[activeSpotlightIndex] && (
+              <motion.div
+                key={featuredProjects[activeSpotlightIndex].id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                className="w-full"
+              >
+                {/* Subtle background number */}
+                <div className="absolute -bottom-10 -right-10 text-[12rem] font-display font-black text-white/[0.02] pointer-events-none group-hover/details:text-accent-primary/[0.02] transition-colors duration-500 select-none">
+                  {activeSpotlightIndex + 1}
                 </div>
-              )}
 
-              {/* Bottom Gradient Overlay & Metadata */}
-              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none" />
-              
-              <div className="absolute inset-0 p-6 md:p-10 flex flex-col justify-end z-10 pointer-events-none">
-                <div className="flex justify-between items-end gap-6">
-                  <div className="space-y-4 max-w-2xl pointer-events-auto">
-                    <h3 className="text-[28px] md:text-[32px] font-display font-bold text-white leading-tight">
-                      {activeProject?.title}
-                    </h3>
-                    <p className="text-sm md:text-base text-white/70 font-medium leading-relaxed max-w-[90%] line-clamp-2">
-                      {activeProject?.short_description}
-                    </p>
-                    
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[12px] font-mono text-white/50">
-                      {activeProject?.github_stars && (
-                        <span className="flex items-center gap-1.5 text-amber-400">
-                          <span className="w-1 h-1 rounded-full bg-current" />
-                          {activeProject.github_stars} stars
-                        </span>
-                      )}
-                      <span className="opacity-30">·</span>
-                      <span className="uppercase tracking-widest">{activeProject?.tech_stack?.join(' · ')}</span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+                  <div className="md:col-span-1 space-y-6">
+                    <div>
+                      <span className="text-[10px] font-mono text-accent-primary uppercase tracking-[0.2em] font-bold block mb-2">Technical Core</span>
+                      <div className="flex flex-wrap gap-2">
+                        {featuredProjects[activeSpotlightIndex].tech_stack?.map(tech => (
+                          <span key={tech} className="px-2 py-1 bg-white/5 rounded text-[9px] font-mono text-white/50 border border-white/5 uppercase">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  {/* GitHub Action in Corner */}
-                  {activeProject?.github_url && (
-                    <a 
-                      href={activeProject.github_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-4 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all group/icon mb-2 shrink-0 pointer-events-auto"
-                      aria-label="View source code on GitHub"
-                    >
-                      <Code2 className="w-6 h-6 group-hover/icon:scale-110 transition-transform" />
-                    </a>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* ZONE B: SELECTOR STRIP (38%) */}
-        <div className="lg:col-span-4 h-full">
-          <div className="flex flex-col gap-4">
-            {selectorProjects.map((project) => (
-              <ProjectThumb 
-                key={project.id} 
-                project={project} 
-                onClick={() => {
-                  setActiveId(project.id)
-                  trackEvent('project_switch', { title: project.title })
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-      </div>
-
-      {/* SHOW ALL DRAWER */}
-      {remainingProjects.length > 0 && (
-        <div className="mt-12 border-t border-bg-border pt-12">
-          <button 
-            onClick={() => setShowAll(!showAll)}
-            className="w-full flex items-center justify-between p-6 bg-bg-surface border border-bg-border rounded-xl hover:border-accent-primary/30 transition-all group"
-          >
-            <div className="flex items-center gap-4">
-              <span className="px-3 py-1 bg-bg-elevated border border-bg-border rounded-full text-[11px] font-bold text-text-secondary">
-                +{remainingProjects.length} projects
-              </span>
-              <span className="text-sm font-bold text-text-primary uppercase tracking-widest">Engineering Archive</span>
-            </div>
-            <div className="flex items-center gap-2 text-accent-primary font-bold text-sm">
-              {showAll ? 'Show Less' : 'Explore All'}
-              {showAll ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-0.5" />}
-            </div>
-          </button>
-
-          <AnimatePresence>
-            {showAll && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as any }}
-                className="overflow-hidden"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-8">
-                  {remainingProjects.map((project) => (
-                    <motion.div
-                      key={project.id}
-                      className="relative aspect-video rounded-lg overflow-hidden border border-bg-border group cursor-pointer bg-bg-surface shadow-md"
-                      onClick={() => {
-                        setActiveId(project.id)
-                        setShowAll(false)
-                        window.scrollTo({ top: (containerRef.current?.offsetTop || 0) - 100, behavior: 'smooth' })
-                      }}
-                    >
-                      {project.thumbnail_path ? (
-                        <img src={getPublicUrl('portfolio-assets', project.thumbnail_path)} alt="" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center"><ImageIcon className="w-6 h-6 text-text-muted/20" /></div>
-                      )}
-                      <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4">
-                        <span className="text-white text-xs font-bold text-center mb-1">{project.title}</span>
-                        <span className="text-white/50 text-[10px] font-mono">{project.category || 'System'}</span>
+                  <div className="md:col-span-2 space-y-8">
+                    <div className="space-y-3">
+                      <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] block">The Implementation</span>
+                      <div className="overflow-y-auto max-h-[110px] md:max-h-[135px] pr-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                        <p className="text-white/80 leading-relaxed font-medium text-sm md:text-base">
+                          {featuredProjects[activeSpotlightIndex].long_description || featuredProjects[activeSpotlightIndex].short_description}
+                        </p>
                       </div>
-                    </motion.div>
-                  ))}
+                    </div>
+                    
+                    <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        {featuredProjects[activeSpotlightIndex].github_stars !== null && featuredProjects[activeSpotlightIndex].github_stars !== undefined && featuredProjects[activeSpotlightIndex].github_stars > 0 && (
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/5">
+                            <span className="text-accent-primary text-xs font-bold">★</span>
+                            <span className="text-[10px] font-mono text-white/60">{featuredProjects[activeSpotlightIndex].github_stars} Stars</span>
+                          </div>
+                        )}
+                        <div className="text-[10px] font-mono text-white/30 uppercase tracking-widest">
+                          {featuredProjects[activeSpotlightIndex].category}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        {featuredProjects[activeSpotlightIndex].demo_url && (
+                          <a 
+                            href={featuredProjects[activeSpotlightIndex].demo_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-accent-primary text-black rounded-full font-bold text-xs transition-transform hover:scale-105 active:scale-95"
+                          >
+                            <span>Live Preview</span>
+                            <ArrowUpRight className="w-3.5 h-3.5" />
+                          </a>
+                        )}
+                        {featuredProjects[activeSpotlightIndex].github_url && (
+                          <a 
+                            href={featuredProjects[activeSpotlightIndex].github_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="p-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-white/20 transition-all"
+                            aria-label="GitHub Repository"
+                          >
+                            <GitBranch className="w-4 h-4" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
-      )}
-    </AnimatedSection>
-  )
-}
+        </motion.div>
+      </div>
 
-function ProjectThumb({ project, onClick }: { project: any, onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-full flex items-center gap-4 p-3 rounded-xl border border-transparent hover:bg-bg-surface hover:border-bg-border transition-all group"
-    >
-      <div className="relative aspect-video w-24 rounded-lg overflow-hidden border border-bg-border shrink-0 transition-transform group-hover:scale-[1.02]">
-        {project.thumbnail_path ? (
-          <img 
-            src={getPublicUrl('portfolio-assets', project.thumbnail_path)} 
-            alt=""
-            className="w-full h-full object-cover" 
-          />
-        ) : (
-          <div className="w-full h-full bg-bg-elevated flex items-center justify-center">
-            <ImageIcon className="w-4 h-4 text-text-muted/40" />
-          </div>
-        )}
+      {/* The Archive Section */}
+      <div className="relative z-10 mt-20">
+        <div className="flex flex-col items-center gap-8">
+          <motion.button
+            onClick={() => setShowArchive(!showArchive)}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="group relative flex items-center gap-3 px-8 py-4 bg-white/[0.03] border border-white/10 rounded-2xl hover:bg-white/5 transition-all hover:border-accent-primary/30"
+          >
+            <div className="p-2 bg-white/5 rounded-lg group-hover:bg-accent-primary group-hover:text-black transition-colors">
+              <Layers className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest block">Explore full collection</span>
+              <span className="text-sm font-bold text-white uppercase tracking-tight">
+                {showArchive ? 'Collapse Archive' : `View Project Archive (${projects.length}+)`}
+              </span>
+            </div>
+            {showArchive ? <ChevronUp className="w-5 h-5 text-white/20 ml-4" /> : <ChevronDown className="w-5 h-5 text-white/20 ml-4" />}
+          </motion.button>
+
+          <AnimatePresence>
+            {showArchive && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full pt-12 border-t border-white/5"
+              >
+                <div className="mb-8">
+                  <h3 className="text-2xl font-display font-black text-white uppercase tracking-tightest">The Full Archive</h3>
+                  <p className="text-xs text-white/30 font-mono mt-2 uppercase tracking-widest">Scalable inventory of all engineered projects</p>
+                </div>
+                <ProjectArchive projects={projects} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
-      <div className="flex-1 min-w-0">
-        <h4 className="text-[14px] font-bold text-text-secondary group-hover:text-primary transition-colors truncate">
-          {project.title}
-        </h4>
-        <p className="text-[10px] font-mono text-text-muted uppercase tracking-wider mt-0.5">
-          {project.category || 'Production'}
-        </p>
-      </div>
-      <ChevronRight className="w-4 h-4 text-text-muted opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
-    </button>
+    </AnimatedSection>
   )
 }

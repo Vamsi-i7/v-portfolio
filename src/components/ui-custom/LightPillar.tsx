@@ -13,9 +13,12 @@ interface PillarProps {
 const Pillar = ({ position, color, speed, delay }: PillarProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
 
-  useFrame((state) => {
+  const timeRef = useRef(0);
+
+  useFrame((_state, delta) => {
     if (!meshRef.current) return;
-    const time = state.clock.getElapsedTime() + delay;
+    timeRef.current += delta;
+    const time = timeRef.current + delay;
     const y = ((time * speed) % 20) - 10;
     meshRef.current.position.y = y;
     
@@ -38,6 +41,22 @@ interface LightPillarProps {
   speed?: number;
 }
 
+// Pre-generate static random seeds at the module level (100% pure relative to React rendering)
+const MAX_PILLARS = 100;
+const seedX = new Float32Array(MAX_PILLARS);
+const seedZ = new Float32Array(MAX_PILLARS);
+const seedColorIdx = new Float32Array(MAX_PILLARS);
+const seedSpeedOffset = new Float32Array(MAX_PILLARS);
+const seedDelay = new Float32Array(MAX_PILLARS);
+
+for (let i = 0; i < MAX_PILLARS; i++) {
+  seedX[i] = Math.random() - 0.5;
+  seedZ[i] = Math.random() - 0.5;
+  seedColorIdx[i] = Math.random();
+  seedSpeedOffset[i] = Math.random();
+  seedDelay[i] = Math.random();
+}
+
 export const LightPillar = ({ 
   count = 40, 
   colors = ['#ffffff', '#FF9500', '#E68600', '#FFB74D'],
@@ -45,15 +64,16 @@ export const LightPillar = ({
 }: LightPillarProps) => {
   
   const pillars = useMemo(() => {
-    return Array.from({ length: count }).map(() => ({
+    const limit = Math.min(count, MAX_PILLARS);
+    return Array.from({ length: limit }).map((_, i) => ({
       position: [
-        (Math.random() - 0.5) * 20,
+        seedX[i] * 20,
         0,
-        (Math.random() - 0.5) * 10
+        seedZ[i] * 10
       ] as [number, number, number],
-      color: colors[Math.floor(Math.random() * colors.length)],
-      speed: speed + Math.random() * 0.5,
-      delay: Math.random() * 20
+      color: colors[Math.floor(seedColorIdx[i] * colors.length)],
+      speed: speed + seedSpeedOffset[i] * 0.5,
+      delay: seedDelay[i] * 20
     }));
   }, [count, colors, speed]);
 

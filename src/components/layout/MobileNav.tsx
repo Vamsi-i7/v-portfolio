@@ -22,7 +22,7 @@ export function MobileNav() {
             <a
               key={link.href}
               href={link.href}
-              className="text-text-secondary transition-all hover:text-accent-primary active:scale-75"
+              className="flex items-center justify-center w-7 h-7 rounded-full text-text-secondary transition-all hover:text-accent-primary active:scale-75 hover:bg-white/5"
               aria-label={link.label}
             >
               <Icon className="w-5 h-5" strokeWidth={2.5} />

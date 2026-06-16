@@ -358,9 +358,16 @@ export type Database = {
       }
       settings: {
         Row: {
+          about_philosophy: string | null
+          about_principles: Json | null
+          availability_status: string | null
           bio: string | null
+          contact_description: string | null
+          contact_headline: string | null
+          copyright_text: string | null
           created_at: string | null
           email: string | null
+          footer_tagline: string | null
           full_name: string
           id: string
           location: string | null
@@ -368,6 +375,7 @@ export type Database = {
           og_image_path: string | null
           owner_user_id: string | null
           profile_image_path: string | null
+          response_protocol: string | null
           resume_path: string | null
           site_title: string | null
           social_links: Json | null
@@ -375,9 +383,16 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          about_philosophy?: string | null
+          about_principles?: Json | null
+          availability_status?: string | null
           bio?: string | null
+          contact_description?: string | null
+          contact_headline?: string | null
+          copyright_text?: string | null
           created_at?: string | null
           email?: string | null
+          footer_tagline?: string | null
           full_name: string
           id?: string
           location?: string | null
@@ -385,6 +400,7 @@ export type Database = {
           og_image_path?: string | null
           owner_user_id?: string | null
           profile_image_path?: string | null
+          response_protocol?: string | null
           resume_path?: string | null
           site_title?: string | null
           social_links?: Json | null
@@ -392,9 +408,16 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          about_philosophy?: string | null
+          about_principles?: Json | null
+          availability_status?: string | null
           bio?: string | null
+          contact_description?: string | null
+          contact_headline?: string | null
+          copyright_text?: string | null
           created_at?: string | null
           email?: string | null
+          footer_tagline?: string | null
           full_name?: string
           id?: string
           location?: string | null
@@ -402,6 +425,7 @@ export type Database = {
           og_image_path?: string | null
           owner_user_id?: string | null
           profile_image_path?: string | null
+          response_protocol?: string | null
           resume_path?: string | null
           site_title?: string | null
           social_links?: Json | null

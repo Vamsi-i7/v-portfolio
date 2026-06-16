@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useCertificates } from '@/hooks/queries/useCertificates'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
 import { getPublicUrl } from '@/lib/storage'
@@ -10,6 +11,23 @@ import type { Tables } from '@/types/database.types'
 export function Certificates() {
   const { data: certificates, isLoading } = useCertificates()
   const [selectedCert, setSelectedCert] = useState<Tables<'certificates'> | null>(null)
+
+  // Lock scroll and handle Escape key when modal is open
+  useEffect(() => {
+    if (!selectedCert) return
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedCert(null)
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = ''
+    }
+  }, [selectedCert])
 
   if (isLoading || !certificates?.length) return null
 
@@ -38,15 +56,23 @@ export function Certificates() {
               className="group bg-bg-surface border border-bg-border rounded-xl overflow-hidden shadow-sm hover:shadow-glow-accent hover:border-accent-primary transition-all"
             >
               {/* Image Preview Area */}
-              <div 
+              <div
+                role={hasImage ? 'button' : undefined}
+                tabIndex={hasImage ? 0 : undefined}
                 className={`relative aspect-video w-full border-b border-bg-border overflow-hidden ${hasImage ? 'cursor-pointer' : 'bg-bg-elevated'}`}
                 onClick={() => hasImage && setSelectedCert(cert)}
+                onKeyDown={(e) => {
+                  if (hasImage && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault()
+                    setSelectedCert(cert)
+                  }
+                }}
               >
                 {hasImage ? (
                   <>
-                    <img 
-                      src={getPublicUrl('portfolio-assets', cert.certificate_image_path!)} 
-                      alt={cert.title} 
+                    <img
+                      src={getPublicUrl('portfolio-assets', cert.certificate_image_path!)}
+                      alt={cert.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -84,9 +110,9 @@ export function Certificates() {
                     {year}
                   </span>
                   {cert.verification_url && (
-                    <a 
-                      href={cert.verification_url} 
-                      target="_blank" 
+                    <a
+                      href={cert.verification_url}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-[11px] font-bold text-accent-primary hover:text-accent-primary-dark transition-colors flex items-center gap-1"
                     >
@@ -100,59 +126,70 @@ export function Certificates() {
         })}
       </div>
 
-      {/* Modal for full credential viewing */}
-      <AnimatePresence>
-        {selectedCert && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-xl"
-            onClick={() => setSelectedCert(null)}
-          >
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative max-w-5xl w-full bg-bg-surface border border-bg-border rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-full"
-              onClick={e => e.stopPropagation()}
+      {/* Modal — portal renders directly to document.body to escape stacking context */}
+      {createPortal(
+        <AnimatePresence>
+          {selectedCert && (
+            <motion.div
+              key="cert-modal"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-xl"
+              onClick={() => setSelectedCert(null)}
+              aria-modal="true"
+              role="dialog"
+              aria-label={`Certificate: ${selectedCert.title}`}
             >
-              <div className="flex items-center justify-between p-4 border-b border-bg-border bg-bg-elevated/50 shrink-0">
-                <div className="flex items-center gap-3">
-                  <Award className="w-5 h-5 text-accent-primary shrink-0" />
-                  <h3 className="font-bold text-primary truncate">{selectedCert.title}</h3>
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                className="relative max-w-5xl w-full bg-bg-surface border border-bg-border rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between p-4 border-b border-bg-border bg-bg-elevated/50 shrink-0">
+                  <div className="flex items-center gap-3">
+                    <Award className="w-5 h-5 text-accent-primary shrink-0" />
+                    <h3 className="font-bold text-primary truncate">{selectedCert.title}</h3>
+                  </div>
+                  <button
+                    onClick={() => setSelectedCert(null)}
+                    className="p-2 rounded-full hover:bg-white/10 transition-colors shrink-0 ml-2"
+                    aria-label="Close certificate preview"
+                  >
+                    <X className="w-5 h-5 text-text-secondary" />
+                  </button>
                 </div>
-                <button 
-                  onClick={() => setSelectedCert(null)}
-                  className="p-2 rounded-full hover:bg-white/10 transition-colors shrink-0 ml-2"
-                >
-                  <X className="w-5 h-5 text-text-secondary" />
-                </button>
-              </div>
-              
-              <div className="p-4 md:p-10 overflow-y-auto flex-1 flex items-center justify-center bg-black/40 min-h-0">
-                <img 
-                  src={getPublicUrl('portfolio-assets', selectedCert.certificate_image_path)} 
-                  alt={selectedCert.title}
-                  className="max-w-full max-h-[50vh] md:max-h-[70vh] object-contain rounded shadow-lg border border-white/10"
-                />
-              </div>
 
-              <div className="p-4 border-t border-bg-border bg-bg-elevated/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
-                <span className="text-sm text-text-secondary font-medium">Issued by {selectedCert.issuer_name}</span>
-                {selectedCert.verification_url && (
-                  <Button asChild size="sm" className="w-full sm:w-auto bg-accent-primary text-black font-bold hover:bg-accent-primary-dark">
-                    <a href={selectedCert.verification_url} target="_blank" rel="noopener noreferrer">
-                      Verify Authenticity <ExternalLink className="w-4 h-4 ml-2" />
-                    </a>
-                  </Button>
-                )}
-              </div>
+                {/* Image */}
+                <div className="p-4 md:p-10 overflow-y-auto flex-1 flex items-center justify-center bg-black/40 min-h-0">
+                  <img
+                    src={getPublicUrl('portfolio-assets', selectedCert.certificate_image_path)}
+                    alt={selectedCert.title}
+                    className="max-w-full max-h-[50vh] md:max-h-[65vh] object-contain rounded shadow-lg border border-white/10"
+                  />
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 border-t border-bg-border bg-bg-elevated/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
+                  <span className="text-sm text-text-secondary font-medium">Issued by {selectedCert.issuer_name}</span>
+                  {selectedCert.verification_url && (
+                    <Button asChild size="sm" className="w-full sm:w-auto bg-accent-primary text-black font-bold hover:bg-accent-primary-dark">
+                      <a href={selectedCert.verification_url} target="_blank" rel="noopener noreferrer">
+                        Verify Authenticity <ExternalLink className="w-4 h-4 ml-2" />
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </AnimatedSection>
   )
 }

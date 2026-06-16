@@ -10,6 +10,7 @@ export function useJourneyEntries() {
       const { data, error } = await supabase
         .from('journey_entries')
         .select('*')
+        .eq('status', 'published')
         .order('display_order', { ascending: true })
         .order('entry_date', { ascending: false })
 

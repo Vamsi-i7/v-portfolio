@@ -1,0 +1,5 @@
+- [x] Center Hero section content by adjusting padding top/bottom (`pt-20 pb-8 lg:py-0`) in `Hero.tsx`
+- [x] Limit about profile image size on mobile to `max-w-[280px]` in `About.tsx`
+- [x] Compact mobile footer (paddings, horizontal nav index, hidden bio description, fixed social icon dimensions) in `Footer.tsx`
+- [x] Implement global click listener in `SmoothScroll.tsx` to intercept all anchor link clicks page-wide and animate smooth scrolling with Lenis (desktop and mobile)
+- [x] Verify build and correctness

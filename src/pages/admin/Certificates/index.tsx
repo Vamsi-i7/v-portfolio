@@ -14,7 +14,7 @@ type CertificateRow = Database['public']['Tables']['certificates']['Row']
 
 export function CertificatesList() {
   const navigate = useNavigate()
-  const { data: certificates = [], isLoading } = useCertificates()
+  const { data: certificates = [], isLoading } = useCertificates(true)
   const { mutateAsync: deleteCertificate, isPending: isDeleting } = useDeleteCertificate()
   const { toast } = useToast()
   

@@ -13,13 +13,18 @@ const supabase = createClient(
 );
 
 async function run() {
-  const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
-  if (bucketError) console.error("Bucket Error:", bucketError.message);
-  else console.log("Buckets:", buckets.map(b => b.name));
+  const { data: experiences, error: expError } = await supabase.from('experience').select('*');
+  if (expError) console.error("Exp Error:", expError.message);
+  else console.log("Experiences:", JSON.stringify(experiences, null, 2));
 
-  const { data: certs, error: certError } = await supabase.from('certificates').select('issuer_logo_path, certificate_image_path');
-  if (certError) console.error("Cert Error:", certError.message);
-  else console.log("Certs stored paths:", certs);
+  const { data: journey, error: journeyError } = await supabase.from('journey_entries').select('*');
+  if (journeyError) console.error("Journey Error:", journeyError.message);
+  else console.log("Journey Entries:", JSON.stringify(journey, null, 2));
+
+  const { data: achievements, error: achError } = await supabase.from('achievements').select('*');
+  if (achError) console.error("Achievements Error:", achError.message);
+  else console.log("Achievements:", JSON.stringify(achievements, null, 2));
 }
 
 run();
+
