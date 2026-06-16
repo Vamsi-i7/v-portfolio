@@ -1,13 +1,16 @@
+import { useState } from 'react'
 import { useAchievements } from '@/hooks/queries/useAchievements'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
 import { motion } from 'framer-motion'
-import { Trophy, Star, Target, Zap, ArrowUpRight, type LucideIcon } from 'lucide-react'
+import { Trophy, Star, Target, Zap, Award, type LucideIcon } from 'lucide-react'
+import { RevealText } from '@/components/ui-custom/RevealText'
 
 const ICON_MAP: Record<string, LucideIcon> = {
   trophy: Trophy,
   star: Star,
   target: Target,
   zap: Zap,
+  award: Award,
 }
 
 export function Achievements() {
@@ -16,78 +19,114 @@ export function Achievements() {
   if (isLoading || !achievements?.length) return null
 
   return (
-    <AnimatedSection id="achievements" className="section-container relative" aria-labelledby="achievements-title">
+    <AnimatedSection id="achievements" className="section-container relative py-12 md:py-16" aria-labelledby="achievements-title">
       <div className="mb-12">
-        <span className="section-label">Milestones</span>
-        <h2 id="achievements-title" className="text-section font-display font-bold tracking-tight mt-2">
-          Recognition
-        </h2>
+        <span className="text-[10px] font-mono uppercase tracking-[0.5em] text-accent-primary mb-3 block">Milestones</span>
+        <RevealText text="Recognition" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-primary uppercase" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {achievements.map((achievement, index) => {
-          const IconComponent = achievement.icon_name && ICON_MAP[achievement.icon_name] 
-            ? ICON_MAP[achievement.icon_name] 
-            : Trophy
-
-          return (
-            <motion.div
-              key={achievement.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group p-6 rounded-2xl bg-bg-surface border border-bg-border hover:border-accent-primary/50 transition-all shadow-sm hover:shadow-glow-accent relative overflow-hidden"
-            >
-              {/* Background Glow */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-accent-primary/5 rounded-full blur-[40px] group-hover:bg-accent-primary/10 transition-colors" />
-
-              <div className="flex items-start gap-5 relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-bg-elevated border border-bg-border flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                  <IconComponent className="w-6 h-6 text-accent-primary" />
-                </div>
-                
-                <div className="flex-1 space-y-2">
-                  <div className="flex flex-col">
-                    <h3 className="text-lg font-bold text-primary leading-tight">
-                      {achievement.title}
-                    </h3>
-                    {achievement.platform && (
-                      <span className="text-xs font-medium text-text-secondary mt-1">
-                        {achievement.platform}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {achievement.value && (
-                    <div className="inline-flex items-center gap-2 text-sm font-mono font-bold text-accent-primary bg-accent-primary/10 px-2 py-1 rounded">
-                      {achievement.value}
-                    </div>
-                  )}
-
-                  <div className="pt-2 flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-text-muted uppercase tracking-widest">
-                      {achievement.achievement_type}
-                    </span>
-                    
-                    {achievement.link_url && (
-                      <a 
-                        href={achievement.link_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-text-muted hover:text-accent-primary transition-colors p-1"
-                        aria-label={`View details for ${achievement.title}`}
-                      >
-                        <ArrowUpRight className="w-4 h-4" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )
-        })}
+      <div className="flex flex-wrap gap-6 justify-center max-w-5xl mx-auto">
+        {achievements.map((achievement, index) => (
+          <AchievementCard 
+            key={achievement.id}
+            achievement={achievement}
+            index={index}
+          />
+        ))}
       </div>
     </AnimatedSection>
+  )
+}
+
+interface Achievement {
+  id: string
+  title: string
+  value?: string | null
+  icon_name?: string | null
+  platform?: string | null
+  achievement_type?: string | null
+  achieved_at?: string | null
+}
+
+function AchievementCard({ achievement, index }: { achievement: Achievement, index: number }) {
+  const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({})
+  
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget
+    const box = card.getBoundingClientRect()
+    const x = e.clientX - box.left - box.width / 2
+    const y = e.clientY - box.top - box.height / 2
+    
+    const rotateX = -(y / (box.height / 2)) * 10
+    const rotateY = (x / (box.width / 2)) * 10
+
+    setTiltStyle({
+      transform: `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`,
+      transition: 'transform 0.08s ease-out',
+    })
+  }
+
+  const handleMouseLeave = () => {
+    setTiltStyle({
+      transform: 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+      transition: 'transform 0.4s ease-out',
+    })
+  }
+
+  const IconComponent = achievement.icon_name && ICON_MAP[achievement.icon_name] 
+    ? ICON_MAP[achievement.icon_name] 
+    : Trophy
+  
+  let metric = achievement.value
+  let label = achievement.title
+  if (!metric) {
+    const match = achievement.title.match(/^(\d+(?:\+|-|%)?)\s+(.*)$/)
+    if (match) {
+      metric = match[1]
+      label = match[2]
+    } else {
+      metric = achievement.title
+      label = achievement.platform || achievement.achievement_type || 'Achievement'
+    }
+  }
+
+  const year = achievement.achieved_at ? new Date(achievement.achieved_at).getFullYear() : null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9, y: 15 }}
+      whileInView={{ opacity: 1, scale: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ type: "spring", stiffness: 100, damping: 15, delay: index * 0.05 }}
+      className="group flex flex-col w-full sm:w-[260px] h-[140px] p-5 rounded-2xl bg-gradient-to-b from-white/[0.03] to-transparent border border-white/[0.06] backdrop-blur-md hover:border-accent-primary/20 hover:bg-white/[0.04] transition-all justify-between shadow-[0_4px_24px_rgba(0,0,0,0.4)] hover:shadow-[0_4px_30px_rgba(0,0,0,0.6)] relative overflow-hidden cursor-default"
+      style={tiltStyle}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Background glow on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+      {/* Icon & Year */}
+      <div className="flex justify-between items-start relative z-10">
+        <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-accent-primary/10 transition-colors duration-300">
+          <IconComponent className="w-4 h-4 text-accent-primary group-hover:scale-110 transition-transform duration-300" />
+        </div>
+        {year && (
+          <span className="text-[9px] font-mono font-bold tracking-widest text-white/40 bg-white/5 border border-white/10 px-2 py-0.5 rounded">
+            {year}
+          </span>
+        )}
+      </div>
+
+      {/* Metric & Label */}
+      <div className="space-y-1.5 relative z-10">
+        <div className="text-2xl font-black font-display text-white tracking-tight group-hover:text-accent-primary transition-colors leading-none truncate" title={metric}>
+          {metric}
+        </div>
+        <div className="text-[10px] uppercase font-mono text-white/40 tracking-wider font-semibold truncate block mt-0.5" title={label}>
+          {label}
+        </div>
+      </div>
+    </motion.div>
   )
 }

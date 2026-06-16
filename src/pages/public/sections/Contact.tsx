@@ -3,10 +3,11 @@ import { useSettings } from '@/hooks/queries/useSettings'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
 import { MagneticButton } from '@/components/ui-custom/MagneticButton'
 import { Button } from '@/components/ui/button'
-import { Send, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
 import { trackEvent } from '@/lib/analytics'
+import { GitBranch, AtSign, Send, MapPin } from 'lucide-react'
+import { RevealText } from '@/components/ui-custom/RevealText'
 
 export function Contact() {
   const { data: settings } = useSettings()
@@ -19,6 +20,11 @@ export function Contact() {
     message: '',
     website: '', // Honeypot
   })
+
+  // Safely parse social links
+  const socialLinks = typeof settings?.social_links === 'object' && settings.social_links 
+    ? (settings.social_links as Record<string, string>)
+    : {}
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,17 +55,10 @@ export function Contact() {
       toast({
         variant: 'destructive',
         title: 'Send Failed',
-        description: 'There was an issue sending your message. Opening your email client instead...',
+        description: 'There was an issue sending your message. Please try again or connect via LinkedIn.',
       })
 
-      trackEvent('contact_submit', { status: 'fallback' })
-
-      // Fallback to mailto
-      if (settings?.email) {
-        const subject = encodeURIComponent(`Message from ${formData.name}`)
-        const body = encodeURIComponent(formData.message)
-        window.location.href = `mailto:${settings.email}?subject=${subject}&body=${body}`
-      }
+      trackEvent('contact_submit', { status: 'failed' })
     } finally {
       setIsSubmitting(false)
     }
@@ -73,110 +72,167 @@ export function Contact() {
   return (
     <AnimatedSection id="contact" className="section-container relative" aria-labelledby="contact-title">
       <div className="mb-16">
-        <span className="section-label">Connect</span>
-        <h2 id="contact-title" className="text-section font-display font-bold tracking-tight mt-2">
-          Let's ship something.
-        </h2>
+        <span className="text-[10px] font-mono uppercase tracking-[0.5em] text-white/30 mb-4 block">Communication</span>
+        <RevealText text="Initiate Impact" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-white uppercase" />
       </div>
 
-      <div className="contact-grid-premium">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
         
-        {/* LEFT: PITCH & SOCIAL (60%) */}
-        <div className="flex flex-col justify-between py-2">
-          <div className="max-w-md space-y-10">
-            <p className="text-2xl font-medium text-text-secondary leading-tight">
-              Have a high-impact project in mind? I'm currently open to selective engineering roles and high-stakes consulting.
+        {/* LEFT: Availability & Direct Channels */}
+        <div className="lg:col-span-5 space-y-12">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-accent-primary/10 border border-accent-primary/20">
+              <div className="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse" />
+              <span className="text-[10px] font-black text-accent-primary uppercase tracking-widest">
+                {settings?.availability_status || 'Available for Q3 2026'}
+              </span>
+            </div>
+            <h3 className="text-2xl md:text-3xl text-white font-display font-medium leading-tight">
+              {settings?.contact_headline || 'Looking for a staff-level partner to lead your next technical breakthrough?'}
+            </h3>
+            <p className="text-sm text-white/40 leading-relaxed max-w-[400px]">
+              {settings?.contact_description || "Whether it's complex distributed systems, autonomous AI integration, or scaling product infrastructure, I'm ready to build."}
             </p>
-            
-            <div className="flex flex-col gap-6">
-               <p className="text-xl font-bold text-primary">
-                 Use the secure form to reach my private inbox directly.
-               </p>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Direct Channels</h4>
+            <div className="grid grid-cols-1 gap-3">
+              {socialLinks.linkedin && (
+                <ContactLink icon={<AtSign className="w-4 h-4" />} label="Network" value={socialLinks.linkedin.replace(/https?:\/\/(www\.)?/, '')} href={socialLinks.linkedin} />
+              )}
+              {socialLinks.github && (
+                <ContactLink icon={<GitBranch className="w-4 h-4" />} label="Source" value={socialLinks.github.replace(/https?:\/\/(www\.)?/, '')} href={socialLinks.github} />
+              )}
+              {socialLinks.twitter && (
+                <ContactLink icon={<Send className="w-4 h-4" />} label="Broadcast" value={socialLinks.twitter.replace(/https?:\/\/(www\.)?/, '')} href={socialLinks.twitter} />
+              )}
             </div>
           </div>
 
-          <div className="mt-16 lg:mt-0 space-y-1">
-            <div className="text-[10px] font-mono font-bold text-text-muted uppercase tracking-[0.3em] mb-2">Based In</div>
-            <div className="text-base font-bold text-primary">{settings?.location || 'Global / Remote'}</div>
+          <div className="flex items-center gap-8 pt-4">
+            <div className="space-y-1">
+              <div className="text-[8px] font-mono font-bold text-white/20 uppercase tracking-[0.3em]">Current Hub</div>
+              <div className="flex items-center gap-2 text-xs font-bold text-white/60 uppercase">
+                <MapPin className="w-3 h-3 text-accent-primary" />
+                {settings?.location || 'Global / Remote'}
+              </div>
+            </div>
+            <div className="w-[1px] h-8 bg-white/5" />
+            <div className="space-y-1">
+              <div className="text-[8px] font-mono font-bold text-white/20 uppercase tracking-[0.3em]">Response Protocol</div>
+              <div className="text-xs font-bold text-white/60 uppercase tracking-tight">
+                {settings?.response_protocol || 'Under 12 Hours'}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* RIGHT: MINIMAL FORM (40%) */}
-        <form onSubmit={handleSubmit} className="contact-form-premium" noValidate>
-          <div className="hidden" aria-hidden="true">
-            <input 
-              id="website" 
-              type="text" 
-              value={formData.website} 
-              onChange={handleChange} 
-              tabIndex={-1} 
-              autoComplete="off" 
-            />
-          </div>
+        {/* RIGHT: Transactional Interface */}
+        <div className="lg:col-span-7">
+          <form onSubmit={handleSubmit} className="p-8 md:p-12 rounded-3xl bg-white/[0.02] border border-white/5 backdrop-blur-sm shadow-2xl space-y-8">
+            <div className="hidden" aria-hidden="true">
+              <input 
+                id="website" 
+                type="text" 
+                value={formData.website} 
+                onChange={handleChange} 
+                tabIndex={-1} 
+                autoComplete="off" 
+              />
+            </div>
 
-          <div className="space-y-1">
-            <label htmlFor="name" className="contact-label-minimal">Name</label>
-            <input
-              id="name"
-              type="text"
-              required
-              value={formData.name}
-              onChange={handleChange}
-              className="contact-input-minimal"
-              placeholder="What should I call you?"
-              autoComplete="name"
-            />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-[9px] font-black text-white/20 uppercase tracking-widest">Full Name</label>
+                <input
+                  id="name"
+                  type="text"
+                  required
+                  placeholder="John Doe"
+                  className="w-full bg-transparent border-b border-white/10 py-3 text-sm text-white placeholder:text-white/10 focus:outline-none focus:border-accent-primary transition-colors"
+                  value={formData.name}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-[9px] font-black text-white/20 uppercase tracking-widest">Digital Mail</label>
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  placeholder="john@example.com"
+                  className="w-full bg-transparent border-b border-white/10 py-3 text-sm text-white placeholder:text-white/10 focus:outline-none focus:border-accent-primary transition-colors"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
 
-          <div className="space-y-1">
-            <label htmlFor="email" className="contact-label-minimal">Email Address</label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="contact-input-minimal"
-              placeholder="Where should I reply?"
-              autoComplete="email"
-            />
-          </div>
+            <div className="space-y-2">
+              <label htmlFor="message" className="text-[9px] font-black text-white/20 uppercase tracking-widest">Message Brief</label>
+              <textarea
+                id="message"
+                required
+                rows={4}
+                placeholder="Describe the system, the challenge, or the opportunity..."
+                className="w-full bg-transparent border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-white/10 focus:outline-none focus:border-accent-primary transition-colors resize-none"
+                value={formData.message}
+                onChange={handleChange}
+              />
+            </div>
 
-          <div className="space-y-1">
-            <label htmlFor="message" className="contact-label-minimal">Project Details</label>
-            <textarea
-              id="message"
-              required
-              rows={4}
-              value={formData.message}
-              onChange={handleChange}
-              className="contact-input-minimal resize-none"
-              placeholder="Tell me about your project, timeline, and goals..."
-            />
-          </div>
-
-          <div className="pt-6">
-            <MagneticButton strength={15}>
-              <Button
-                id="contact-submit-btn"
-                type="submit"
-                disabled={isSubmitting}
-                className="h-16 px-12 bg-accent-primary text-black font-bold text-lg hover:bg-accent-primary-dark rounded-full shadow-[0_0_30px_rgba(255,149,0,0.15)] group transition-all"
-              >
-                {isSubmitting ? (
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                ) : (
-                  <>
-                    Send Message
-                    <Send className="ml-4 w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                  </>
-                )}
-              </Button>
-            </MagneticButton>
-          </div>
-        </form>
+            <div className="pt-4">
+              <MagneticButton strength={15}>
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="w-full md:w-auto h-14 px-12 bg-white text-black font-black uppercase tracking-[0.3em] text-[10px] hover:bg-accent-primary hover:text-black transition-all rounded-full shadow-2xl"
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                      Transmitting...
+                    </div>
+                  ) : (
+                    <>
+                      Transmit Inquiry
+                      <Send className="ml-3 w-3.5 h-3.5" />
+                    </>
+                  )}
+                </Button>
+              </MagneticButton>
+            </div>
+          </form>
+        </div>
 
       </div>
     </AnimatedSection>
+  )
+}
+
+interface ContactLinkProps {
+  icon: React.ReactNode
+  label: string
+  value: string
+  href?: string
+}
+
+function ContactLink({ icon, label, value, href }: ContactLinkProps) {
+  return (
+    <a 
+      href={href} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5 group hover:border-accent-primary/20 transition-all"
+    >
+      <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-white/40 group-hover:text-accent-primary transition-colors">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <div className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">{label}</div>
+        <div className="text-sm font-bold text-white/80 truncate">{value}</div>
+      </div>
+    </a>
   )
 }

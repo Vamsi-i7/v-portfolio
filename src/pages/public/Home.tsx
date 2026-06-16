@@ -1,13 +1,16 @@
 import { SEO } from '@/components/layout/SEO'
 import { JsonLd } from '@/components/layout/JsonLd'
-import { Hero } from './sections/Hero'
-import { About } from './sections/About'
-import { Skills } from './sections/Skills'
-import { Projects } from './sections/Projects'
-import { Experience } from './sections/Experience'
-import { Achievements } from './sections/Achievements'
-import { Certificates } from './sections/Certificates'
-import { Contact } from './sections/Contact'
+import { Hero } from './sections/Hero' // Keep Hero eager for LCP
+import { lazy, Suspense } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+
+const About = lazy(() => import('./sections/About').then(m => ({ default: m.About })))
+const Skills = lazy(() => import('./sections/Skills').then(m => ({ default: m.Skills })))
+const Projects = lazy(() => import('./sections/Projects').then(m => ({ default: m.Projects })))
+const Experience = lazy(() => import('./sections/Experience').then(m => ({ default: m.Experience })))
+const Achievements = lazy(() => import('./sections/Achievements').then(m => ({ default: m.Achievements })))
+const Certificates = lazy(() => import('./sections/Certificates').then(m => ({ default: m.Certificates })))
+const Contact = lazy(() => import('./sections/Contact').then(m => ({ default: m.Contact })))
 
 export function Home() {
   return (
@@ -15,37 +18,41 @@ export function Home() {
       <SEO />
       <JsonLd />
 
-      <div id="home" className="relative">
-        <Hero />
-      </div>
+      <AnimatePresence mode="popLayout">
+        <motion.div key="home" layout className="relative">
+          <Hero />
+        </motion.div>
 
-      <div id="projects" className="relative bg-bg-surface/40 backdrop-blur-md border-y border-white/5">
-        <Projects />
-      </div>
+        <Suspense fallback={<div className="h-[400px] w-full animate-pulse bg-white/5 rounded-3xl" />}>
+          <motion.div key="projects" layout className="relative py-16 md:py-24">
+            <Projects />
+          </motion.div>
 
-      <div id="engineering" className="relative">
-        <Skills />
-      </div>
+          <motion.div key="engineering" layout className="relative py-16 md:py-24">
+            <Skills />
+          </motion.div>
 
-      <div id="experience" className="relative bg-bg-surface/40 backdrop-blur-md border-y border-white/5">
-        <Experience />
-      </div>
+          <motion.div key="experience" layout className="relative">
+            <Experience />
+          </motion.div>
 
-      <div id="achievements" className="relative">
-        <Achievements />
-      </div>
+          <motion.div key="achievements" layout className="relative py-16 md:py-24">
+            <Achievements />
+          </motion.div>
 
-      <div id="certifications" className="relative bg-bg-surface/40 backdrop-blur-md border-y border-white/5">
-        <Certificates />
-      </div>
+          <motion.div key="certifications" layout className="relative py-16 md:py-24">
+            <Certificates />
+          </motion.div>
 
-      <div id="about" className="relative">
-        <About />
-      </div>
+          <motion.div key="about" layout className="relative py-16 md:py-24">
+            <About />
+          </motion.div>
 
-      <div id="contact" className="relative bg-bg-surface/40 backdrop-blur-md border-t border-white/5">
-        <Contact />
-      </div>
+          <motion.div key="contact" layout className="relative py-16 md:py-24">
+            <Contact />
+          </motion.div>
+        </Suspense>
+      </AnimatePresence>
     </div>
   )
 }

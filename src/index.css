@@ -140,35 +140,35 @@
     --font-body:    'Inter', system-ui, sans-serif;
     --font-mono:    'JetBrains Mono', monospace;
 
-    /* ── Typography: Scale (Senior Product Redesign) ── */
-    --text-display:     clamp(4.5rem, 10vw, 7rem);    /* Hero name only */
-    --text-hero:        clamp(2.5rem, 5vw, 3.5rem);   /* Hero headline (H1) */
-    --text-section:     clamp(2.5rem, 5vw, 3.5rem);   /* Section headings (H1) */
-    --text-h2:          clamp(1.5rem, 3vw, 2rem);     /* Sub-sections */
-    --text-card-title:  1.25rem;                      /* 20px */
-    --text-body:        1rem;                         /* 16px */
-    --text-small:       0.875rem;                     /* 14px */
-    --text-caption:     0.75rem;                      /* 12px */
-    --text-mono:        0.875rem;                     /* 14px */
+    /* ── Typography: Scale (Elite Engineering Redesign) ── */
+    --text-display:     clamp(3.5rem, 8vw, 6rem);     /* Refined Hero name */
+    --text-hero:        clamp(2rem, 4vw, 3rem);       /* Hero value prop */
+    --text-section:     clamp(2rem, 4vw, 2.5rem);     /* Section headings */
+    --text-h2:          clamp(1.25rem, 2vw, 1.5rem);  /* Sub-sections */
+    --text-card-title:  1.125rem;                     /* 18px */
+    --text-body:        0.9375rem;                    /* 15px */
+    --text-small:       0.8125rem;                    /* 13px */
+    --text-caption:     0.6875rem;                    /* 11px */
+    --text-mono:        0.75rem;                      /* 12px */
 
-    /* ── Spacing: 8-point grid ── */
+    /* ── Spacing: Tighter 8-point grid ── */
     --space-1:  4px;
     --space-2:  8px;
     --space-3:  12px;
     --space-4:  16px;
     --space-5:  24px;
     --space-6:  32px;
-    --space-7:  48px;
-    --space-8:  64px;
-    --space-9:  96px;
-    --space-10: 128px;
-    --space-11: 160px;
+    --space-7:  40px;
+    --space-8:  56px;
+    --space-9:  80px;
+    --space-10: 100px;
+    --space-11: 120px;
 
     /* ── Layout ── */
-    --max-width-content:  1120px; /* Tighter container */
+    --max-width-content:  1100px; 
     --max-width-hero:     800px;
-    --section-gap:        var(--space-10); /* 128px */
-    --card-padding:       var(--space-5);  /* 24px */
+    --section-gap:        var(--space-9); 
+    --card-padding:       var(--space-5);  
 
     /* ── Border Radius ── */
     --radius-sm:   6px;
@@ -198,38 +198,142 @@
     --glass-bg:     rgba(255, 255, 255, 0.04);
     --glass-blur:   blur(12px);
     --glass-border: rgba(255, 255, 255, 0.06);
+    --accent-spotlight: rgba(255, 149, 0, 0.08);
+  }
+
+  /* ─── Dynamic Palette Classes ─── */
+
+  /* 1. Inferno Red (Default theme) */
+  .theme-inferno {
+    --bg-base:              #0B0506;
+    --bg-surface:           #12090A;
+    --bg-elevated:          #1A0C0E;
+    --bg-border:            #2A1215;
+    --text-primary:         #FFF6F4;
+    --text-secondary:       #C4B4B2;
+    --text-muted:           #756769;
+    --accent-primary:       #FF1E1E;
+    --accent-primary-dark:  #D60000;
+    --accent-glow:          rgba(255, 30, 30, 0.15);
+    --accent-spotlight:     rgba(255, 30, 30, 0.08);
+    --ring:                 #FF1E1E;
+    --primary:              #FF1E1E;
+    --accent:               #FF1E1E;
+  }
+
+  /* 2. Warm Amber */
+  .theme-amber {
+    --bg-base:              #0A0A08;
+    --bg-surface:           #121210;
+    --bg-elevated:          #1A1A18;
+    --bg-border:            #262624;
+    --text-primary:         #F0F0F0;
+    --text-secondary:       #A1A19A;
+    --text-muted:           #52524B;
+    --accent-primary:       #FF9500;
+    --accent-primary-dark:  #E68600;
+    --accent-glow:          rgba(255, 149, 0, 0.15);
+    --accent-spotlight:     rgba(255, 149, 0, 0.08);
+    --ring:                 #FF9500;
+    --primary:              #FF9500;
+    --accent:               #FF9500;
+  }
+
+  /* 3. Emerald Cyber */
+  .theme-emerald {
+    --bg-base:              #050806;
+    --bg-surface:           #0B100C;
+    --bg-elevated:          #111813;
+    --bg-border:            #1B261E;
+    --text-primary:         #F3FAF7;
+    --text-secondary:       #A3B8B0;
+    --text-muted:           #576B64;
+    --accent-primary:       #05F292;
+    --accent-primary-dark:  #00CC76;
+    --accent-glow:          rgba(5, 242, 146, 0.15);
+    --accent-spotlight:     rgba(5, 242, 146, 0.08);
+    --ring:                 #05F292;
+    --primary:              #05F292;
+    --accent:               #05F292;
+  }
+
+  /* 4. Nordic Blue */
+  .theme-blue {
+    --bg-base:              #06080B;
+    --bg-surface:           #0C0E14;
+    --bg-elevated:          #13161F;
+    --bg-border:            #1E222F;
+    --text-primary:         #F2F5FA;
+    --text-secondary:       #A0ABC0;
+    --text-muted:           #546078;
+    --accent-primary:       #60A5FA;
+    --accent-primary-dark:  #3B82F6;
+    --accent-glow:          rgba(96, 165, 250, 0.15);
+    --accent-spotlight:     rgba(96, 165, 250, 0.08);
+    --ring:                 #60A5FA;
+    --primary:              #60A5FA;
+    --accent:               #60A5FA;
+  }
+
+  /* 5. Retro Rose */
+  .theme-rose {
+    --bg-base:              #080506;
+    --bg-surface:           #100A0D;
+    --bg-elevated:          #180F13;
+    --bg-border:            #26171F;
+    --text-primary:         #FAF2F4;
+    --text-secondary:       #C0A0A9;
+    --text-muted:           #785461;
+    --accent-primary:       #FF2E93;
+    --accent-primary-dark:  #E01675;
+    --accent-glow:          rgba(255, 46, 147, 0.15);
+    --accent-spotlight:     rgba(255, 46, 147, 0.08);
+    --ring:                 #FF2E93;
+    --primary:              #FF2E93;
+    --accent:               #FF2E93;
+  }
+
+  /* 6. Aura Purple */
+  .theme-purple {
+    --bg-base:              #060508;
+    --bg-surface:           #0B0A10;
+    --bg-elevated:          #120F1B;
+    --bg-border:            #1D172B;
+    --text-primary:         #F6F2FA;
+    --text-secondary:       #AFA0C0;
+    --text-muted:           #665478;
+    --accent-primary:       #A855F7;
+    --accent-primary-dark:  #8B5CF6;
+    --accent-glow:          rgba(168, 85, 247, 0.15);
+    --accent-spotlight:     rgba(168, 85, 247, 0.08);
+    --ring:                 #A855F7;
+    --primary:              #A855F7;
+    --accent:               #A855F7;
+  }
+
+  ::selection {
+    background-color: var(--accent-primary);
+    color: #000;
   }
 }
 
-/* ─── Base / Reset Layer ─────────────────────────────────────────────────────
-   Minimal reset that respects native browser behavior.
-   No global `*` reset per modern-web-guidance guidance.
-   ─────────────────────────────────────────────────────────────────────────── */
+/* ─── Base / Reset Layer ───────────────────────────────────────────────────── */
 @layer base {
-  /* Color scheme: dark-only for V1 per PRD §16.3 deferral list */
   :root {
     color-scheme: dark;
   }
 
   html {
-    /* Smooth scrolling for anchor navigation */
-    scroll-behavior: smooth;
+    scroll-behavior: initial !important; /* Managed by Lenis */
   }
 
   body {
-    background-color: var(--bg-base);
+    background-color: #050505;
     color: var(--text-primary);
     font-family: var(--font-body);
     font-size: var(--text-body);
-    line-height: var(--line-height-body);
-    /* Stable font rendering */
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-size-adjust: from-font;
-    /* Prevent horizontal scroll */
     overflow-x: hidden;
-    /* Prevent layout shift from scrollbar appearing */
-    scrollbar-gutter: stable;
   }
 
   /* Heading defaults — use token scale */
@@ -287,17 +391,22 @@
     }
   }
 
-  /* Scrollbar styling — subtle, matches dark theme */
+  /* Hide custom cursor if it clashes with minimalist theme */
+  .custom-cursor {
+    display: none;
+  }
+
+  /* Scrollbar styling — almost invisible */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 2px;
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--bg-base);
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--bg-border);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-full);
   }
 

@@ -10,6 +10,7 @@ export function useProjects() {
       const { data, error } = await supabase
         .from('projects')
         .select('*')
+        .eq('status', 'published')
         .order('display_order', { ascending: true })
         .order('created_at', { ascending: false })
 

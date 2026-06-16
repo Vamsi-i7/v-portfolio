@@ -1,14 +1,16 @@
+import { useState } from 'react'
 import { useSkills } from '@/hooks/queries/useSkills'
 import { useCodingCache } from '@/hooks/queries/useCodingCache'
 import { AnimatedSection } from '@/components/ui-custom/AnimatedSection'
-import { GitBranch, Code2, Trophy, ExternalLink } from 'lucide-react'
-import { trackEvent } from '@/lib/analytics'
+import { GitBranch, Code2, Trophy } from 'lucide-react'
+import { RevealText } from '@/components/ui-custom/RevealText'
+import { StaggeredMotion } from '@/components/ui-custom/StaggeredMotion'
 import { motion } from 'framer-motion'
 
-// Category display order — most important first
+// Category display order
 const CATEGORY_ORDER = ['Languages', 'Language', 'Frontend', 'AI/ML', 'Backend', 'Database', 'Databases', 'DevOps', 'Cloud', 'Mobile', 'Tools', 'Security']
 
-// Map category names to single canonical display names
+// Canonical display names
 const CATEGORY_LABEL: Record<string, string> = {
   Language: 'Primary',
   Languages: 'Primary',
@@ -28,192 +30,217 @@ export function Skills() {
   const { data: skills, isLoading: skillsLoading } = useSkills()
   const { data: cacheEntries, isLoading: cacheLoading } = useCodingCache()
 
-  const githubData = cacheEntries?.find(e => e.platform === 'github')?.data as any
-  const lcData = cacheEntries?.find(e => e.platform === 'leetcode')?.data as any
-  const cfData = cacheEntries?.find(e => e.platform === 'codeforces')?.data as any
+  interface GithubCache {
+    stats: {
+      contributions_last_year: number | string
+      total_stars: number
+    }
+  }
+  interface LeetcodeCache {
+    stats: {
+      total_solved: number | string
+    }
+    contest: {
+      top_percentage: number | string
+      rating?: number
+    }
+  }
+  interface CodeforcesCache {
+    stats: {
+      rating: number | string
+    }
+    profile: {
+      rank: string
+    }
+  }
+
+  const githubData = cacheEntries?.find(e => e.platform === 'github')?.data as unknown as GithubCache | undefined
+  const lcData = cacheEntries?.find(e => e.platform === 'leetcode')?.data as unknown as LeetcodeCache | undefined
+  const cfData = cacheEntries?.find(e => e.platform === 'codeforces')?.data as unknown as CodeforcesCache | undefined
 
   if (skillsLoading || cacheLoading || !skills?.length) return null
 
-  // Group by category
-  const grouped = skills.reduce((acc, skill) => {
-    const cat = skill.category || 'Tools'
-    if (!acc[cat]) acc[cat] = []
-    acc[cat].push(skill)
+  // Group skills by category
+  const groupedSkills = skills.reduce((acc, skill) => {
+    const category = skill.category
+    const label = CATEGORY_LABEL[category] || category
+    if (!acc[label]) {
+      acc[label] = []
+    }
+    acc[label].push(skill)
     return acc
   }, {} as Record<string, typeof skills>)
 
-  // Sort categories by CATEGORY_ORDER, unknown cats go at end
-  const sortedCategories = Object.keys(grouped).sort((a, b) => {
-    const ai = CATEGORY_ORDER.indexOf(a)
-    const bi = CATEGORY_ORDER.indexOf(b)
-    if (ai === -1 && bi === -1) return a.localeCompare(b)
-    if (ai === -1) return 1
-    if (bi === -1) return -1
-    return ai - bi
-  })
+  // Convert to sorted rows
+  const rows = Object.entries(groupedSkills)
+    .map(([label, rowSkills]) => ({
+      label,
+      skills: rowSkills,
+    }))
+    .sort((a, b) => {
+      const indexA = CATEGORY_ORDER.indexOf(a.label)
+      const indexB = CATEGORY_ORDER.indexOf(b.label)
+      if (indexA === -1 && indexB === -1) return a.label.localeCompare(b.label)
+      if (indexA === -1) return 1
+      if (indexB === -1) return -1
+      return indexA - indexB
+    })
 
-  // Deduplicate canonical labels
-  const seenLabels = new Set<string>()
-  const rows: { label: string; skills: typeof skills; isPrimary: boolean }[] = []
-  for (const cat of sortedCategories) {
-    const label = CATEGORY_LABEL[cat] || cat
-    if (seenLabels.has(label)) {
-      const existing = rows.find(r => r.label === label)
-      if (existing) {
-        existing.skills = [...existing.skills, ...grouped[cat]]
-      }
-    } else {
-      seenLabels.add(label)
-      rows.push({
-        label,
-        skills: grouped[cat],
-        isPrimary: label === 'Primary',
-      })
-    }
-  }
-
-  // Get icon class from identifier or name fallback
-  const getIconClass = (skill: typeof skills[0]) => {
-    if (skill.icon_identifier) {
-      return `devicon-${skill.icon_identifier}-plain`
-    }
-    // Fallback: simple lowercase mapping
-    const fallback = skill.name.toLowerCase().replace(/[^a-z0-9]/g, '')
-    const mappings: Record<string, string> = {
-      'nodejs': 'nodejs-plain',
-      'node': 'nodejs-plain',
-      'reactjs': 'react-original',
-      'react': 'react-original',
-      'aws': 'amazonwebservices-plain-wordmark',
-      'gcp': 'googlecloud-plain',
-      'java': 'java-plain',
-      'python': 'python-plain',
-      'javascript': 'javascript-plain',
-      'js': 'javascript-plain',
-      'typescript': 'typescript-plain',
-      'ts': 'typescript-plain',
-      'tailwind': 'tailwindcss-original',
-      'tailwindcss': 'tailwindcss-original',
-      'supabase': 'supabase-plain',
-      'git': 'git-plain',
-      'postgres': 'postgresql-plain',
-      'postgresql': 'postgresql-plain',
-      'docker': 'docker-plain',
-      'kubernetes': 'kubernetes-plain',
-      'csharp': 'csharp-plain',
-      'cpp': 'cplusplus-plain',
-      'go': 'go-original-wordmark',
-      'rust': 'rust-plain',
-      'html': 'html5-plain',
-      'css': 'css3-plain'
-    }
-
-    const mapped = mappings[fallback] || `${fallback}-plain`
-    return `devicon-${mapped}`
+  const getIconClass = (skill: { icon_identifier?: string | null }) => {
+    if (skill.icon_identifier) return `devicon-${skill.icon_identifier}-plain`
+    return 'devicon-javascript-plain' // fallback
   }
 
   return (
-    <AnimatedSection id="engineering" className="section-container relative" aria-labelledby="dna-title">
-      <div className="mb-12">
-        <span className="section-label">Engineering</span>
-        <h2 id="dna-title" className="text-section font-display font-bold tracking-tight mt-2">
-          Technical DNA
-        </h2>
+    <AnimatedSection id="engineering" className="section-container relative py-16" aria-labelledby="dna-title">
+      <div className="mb-16">
+        <span className="text-[10px] font-mono uppercase tracking-[0.5em] text-white/30 mb-4 block">Dashboard</span>
+        <RevealText text="Engineering DNA" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-white uppercase" />
       </div>
 
-      <div className="space-y-12 mb-16">
-        {rows.map(({ label, skills: rowSkills }, rowIndex) => (
-          <div key={label} className="space-y-4">
-            <h3 className="text-sm font-bold text-text-secondary uppercase tracking-[0.15em] border-b border-bg-border pb-2">
-              {label}
-            </h3>
-            <div className="flex flex-wrap gap-3">
-              {rowSkills
-                .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
-                .map((skill, idx) => (
-                  <motion.div 
-                    key={skill.id} 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true, margin: '-50px' }}
-                    transition={{ duration: 0.3, delay: (rowIndex * 0.1) + (idx * 0.05) }}
-                    className="flex items-center gap-2.5 px-4 py-2 bg-bg-surface border border-bg-border rounded-xl hover:bg-bg-elevated hover:border-accent-primary/50 hover:shadow-glow-accent transition-all cursor-default group"
-                  >
-                    <i className={`${getIconClass(skill)} text-lg text-text-muted group-hover:text-accent-primary transition-colors`} />
-                    <span className="text-sm font-medium text-text-primary">
-                      {skill.name}
-                    </span>
-                  </motion.div>
-                ))}
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        
+        {/* LEFT: Analytics Cards */}
+        <div className="lg:col-span-4 space-y-6">
+          <StaggeredMotion stagger={0.08} className="flex flex-col gap-6">
+            {githubData && (
+              <PlatformMetric 
+                icon={<GitBranch className="w-4 h-4 text-white" />}
+                title="GitHub"
+                value={githubData.stats.contributions_last_year || '500+'}
+                label="Annual Shipped"
+                meta={`${githubData.stats.total_stars} stars`}
+              />
+            )}
+            {lcData && (
+              <PlatformMetric 
+                icon={<Code2 className="w-4 h-4 text-white/80" />}
+                title="LeetCode"
+                value={lcData.stats.total_solved}
+                label="Solved Problems"
+                meta={lcData.contest.rating && lcData.contest.rating > 0 && Number(lcData.contest.top_percentage) > 0 ? `Top ${lcData.contest.top_percentage}%` : 'Unrated'}
+              />
+            )}
+            {cfData && (
+              <PlatformMetric 
+                icon={<Trophy className="w-4 h-4 text-white/80" />}
+                title="Codeforces"
+                value={cfData.stats.rating}
+                label="Elo Rating"
+                meta={cfData.profile.rank}
+              />
+            )}
+          </StaggeredMotion>
+        </div>
+
+        {/* RIGHT: High-Information Stack Grid */}
+        <motion.div 
+          initial={{ opacity: 0, x: 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ type: "spring", stiffness: 80, damping: 15 }}
+          className="lg:col-span-8 p-8 rounded-3xl bg-white/[0.02] border border-white/5 backdrop-blur-sm shadow-2xl"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+            {rows.map(({ label, skills: rowSkills }, rIndex) => (
+              <motion.div 
+                key={label}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: rIndex * 0.05 }}
+                className="space-y-4"
+              >
+                <h3 className="text-[9px] font-black text-white/20 uppercase tracking-[0.4em] flex items-center gap-2">
+                  <div className="w-1 h-1 rounded-full bg-accent-primary" />
+                  {label}
+                </h3>
+                <div className="flex flex-wrap gap-x-6 gap-y-3">
+                  {rowSkills
+                    .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+                    .map((skill, sIndex) => (
+                      <motion.div 
+                        key={skill.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.3, delay: rIndex * 0.05 + sIndex * 0.02 }}
+                        className="group flex items-center gap-2 cursor-default"
+                      >
+                        <i className={`${getIconClass(skill)} text-sm text-white/10 group-hover:text-accent-primary transition-colors`} />
+                        <span className="text-[11px] font-bold text-white/40 group-hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1">
+                          {skill.name}
+                          {skill.proficiency && (
+                            <span className="text-[7px] font-mono text-accent-primary/45 group-hover:text-accent-primary transition-colors tracking-tighter">
+                              ({skill.proficiency.substring(0, 3)})
+                            </span>
+                          )}
+                        </span>
+                      </motion.div>
+                    ))}
+                </div>
+              </motion.div>
+            ))}
           </div>
-        ))}
-      </div>
+        </motion.div>
 
-      <div className="dna-metrics">
-        {githubData && (
-          <a
-            href={`https://github.com/${githubData.profile.username}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="dna-card group"
-            onClick={() => trackEvent('platform_click', { platform: 'github' })}
-          >
-            <div className="dna-header">
-              <span className="flex items-center gap-2 text-accent-primary">
-                <GitBranch className="w-4 h-4" />
-                GitHub
-              </span>
-              <ExternalLink className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-            <div className="dna-value">{githubData.stats.contributions_last_year || '500+'}</div>
-            <div className="dna-label">Contributions / yr</div>
-            <div className="dna-meta">{githubData.stats.total_stars} stars · {githubData.stats.total_repos} repos</div>
-          </a>
-        )}
-
-        {lcData && (
-          <a
-            href={`https://leetcode.com/u/${lcData.profile.username}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="dna-card group"
-            onClick={() => trackEvent('platform_click', { platform: 'leetcode' })}
-          >
-            <div className="dna-header">
-              <span className="flex items-center gap-2 text-amber-500">
-                <Code2 className="w-4 h-4" />
-                LeetCode
-              </span>
-              <ExternalLink className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-            <div className="dna-value">{lcData.stats.total_solved}</div>
-            <div className="dna-label">Problems Solved</div>
-            <div className="dna-meta">Top {lcData.contest.top_percentage}% · Rating {lcData.contest.rating}</div>
-          </a>
-        )}
-
-        {cfData && (
-          <a
-            href={`https://codeforces.com/profile/${cfData.profile.handle}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="dna-card group"
-            onClick={() => trackEvent('platform_click', { platform: 'codeforces' })}
-          >
-            <div className="dna-header">
-              <span className="flex items-center gap-2 text-blue-400">
-                <Trophy className="w-4 h-4" />
-                Codeforces
-              </span>
-              <ExternalLink className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
-            <div className="dna-value">{cfData.stats.rating}</div>
-            <div className="dna-label">Current Rating</div>
-            <div className="dna-meta">{cfData.profile.rank} · Peak {cfData.stats.max_rating}</div>
-          </a>
-        )}
       </div>
     </AnimatedSection>
+  )
+}
+
+interface PlatformMetricProps {
+  icon: React.ReactNode
+  title: string
+  value: string | number
+  label: string
+  meta?: string
+}
+
+function PlatformMetric({ icon, title, value, label, meta }: PlatformMetricProps) {
+  const [tiltStyle, setTiltStyle] = useState<React.CSSProperties>({})
+  
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget
+    const box = card.getBoundingClientRect()
+    const x = e.clientX - box.left - box.width / 2
+    const y = e.clientY - box.top - box.height / 2
+    
+    // Max 8 degrees rotation
+    const rotateX = -(y / (box.height / 2)) * 8
+    const rotateY = (x / (box.width / 2)) * 8
+
+    setTiltStyle({
+      transform: `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`,
+      transition: 'transform 0.08s ease-out',
+    })
+  }
+
+  const handleMouseLeave = () => {
+    setTiltStyle({
+      transform: 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+      transition: 'transform 0.4s ease-out',
+    })
+  }
+
+  return (
+    <div 
+      className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-accent-primary/20 transition-all flex items-center gap-6 group cursor-default"
+      style={tiltStyle}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-accent-primary/10 transition-colors">
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between">
+          <span className="text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">{title}</span>
+          <span className="text-[8px] font-mono text-accent-primary/60">{meta}</span>
+        </div>
+        <div className="text-3xl font-display font-black text-white tracking-tighter leading-tight">{value}</div>
+        <div className="text-[8px] font-mono text-white/10 uppercase tracking-[0.1em]">{label}</div>
+      </div>
+    </div>
   )
 }

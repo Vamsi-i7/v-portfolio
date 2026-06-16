@@ -54,6 +54,9 @@ export default defineConfig(({ mode }) => {
           brotliSize: true,
         }),
     ].filter(Boolean),
+    optimizeDeps: {
+      include: ['@splinetool/react-spline', '@splinetool/runtime'],
+    },
     resolve: {
       alias: {
         '@': resolve(__dirname, './src'),
@@ -68,6 +71,14 @@ export default defineConfig(({ mode }) => {
           // Admin dashboard chunk will be added when admin routes are implemented
           manualChunks(id) {
             if (id.includes('node_modules')) {
+              if (
+                id.includes('three') || 
+                id.includes('@react-three') || 
+                id.includes('postprocessing') ||
+                id.includes('@splinetool')
+              ) {
+                return 'vendor-3d';
+              }
               if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
                 return 'vendor-react';
               }

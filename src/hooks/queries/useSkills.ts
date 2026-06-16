@@ -10,6 +10,7 @@ export function useSkills() {
       const { data, error } = await supabase
         .from('skills')
         .select('*')
+        .eq('status', 'published')
         .order('category', { ascending: true })
         .order('display_order', { ascending: true })
 

@@ -3,14 +3,19 @@ import { supabase } from '@/lib/supabase'
 
 export const CERTIFICATES_QUERY_KEY = ['certificates']
 
-export function useCertificates() {
+export function useCertificates(adminMode = false) {
   return useQuery({
-    queryKey: CERTIFICATES_QUERY_KEY,
+    queryKey: [...CERTIFICATES_QUERY_KEY, { adminMode }],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('certificates')
         .select('*')
-        .eq('status', 'published')
+
+      if (!adminMode) {
+        query = query.eq('status', 'published')
+      }
+
+      const { data, error } = await query
         .order('is_featured', { ascending: false })
         .order('issued_at', { ascending: false })
 

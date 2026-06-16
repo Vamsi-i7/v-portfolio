@@ -10,6 +10,7 @@ export function useExperiences() {
       const { data, error } = await supabase
         .from('experience')
         .select('*')
+        .eq('status', 'published')
         .order('display_order', { ascending: true })
         .order('start_date', { ascending: false })
 
