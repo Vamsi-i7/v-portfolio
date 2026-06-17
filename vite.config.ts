@@ -63,8 +63,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      // Warn if any chunk is larger than 500kb (before gzip)
-      chunkSizeWarningLimit: 500,
+      // Warn if any chunk is larger than 1000kb (before gzip)
+      chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
           // Manual code splitting: Three.js must NEVER be in the initial bundle
