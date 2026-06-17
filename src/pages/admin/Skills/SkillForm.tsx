@@ -179,7 +179,7 @@ export function SkillForm() {
                 placeholder="e.g. react, typescript" 
                 className="flex-1"
               />
-              <div className="w-10 h-10 border border-border rounded-md flex items-center justify-center bg-surface shrink-0">
+              <div className="w-[40px] h-[40px] border border-border rounded-md flex items-center justify-center bg-surface shrink-0">
                 {!watchIconId || iconError ? (
                   <Code2 className="w-5 h-5 text-muted-foreground" />
                 ) : (

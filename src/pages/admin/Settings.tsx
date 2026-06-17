@@ -172,7 +172,7 @@ export function Settings() {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-display font-bold tracking-tight">Settings</h1>
           <p className="text-muted-foreground mt-1">
@@ -182,7 +182,7 @@ export function Settings() {
         <Button 
           onClick={handleSubmit(onSubmit)} 
           disabled={!isDirty || isSaving}
-          className="btn-accent"
+          className="btn-accent shrink-0 w-full sm:w-auto"
         >
           {isSaving ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -194,12 +194,12 @@ export function Settings() {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="bg-surface border border-border">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="media">Media & Assets</TabsTrigger>
-          <TabsTrigger value="social">Social Links</TabsTrigger>
-          <TabsTrigger value="copy">Landing Copy</TabsTrigger>
-          <TabsTrigger value="seo">SEO & Meta</TabsTrigger>
+        <TabsList className="bg-surface border border-border flex w-full overflow-x-auto whitespace-nowrap scrollbar-none justify-start md:justify-center md:flex-wrap">
+          <TabsTrigger value="profile" className="shrink-0">Profile</TabsTrigger>
+          <TabsTrigger value="media" className="shrink-0">Media & Assets</TabsTrigger>
+          <TabsTrigger value="social" className="shrink-0">Social Links</TabsTrigger>
+          <TabsTrigger value="copy" className="shrink-0">Landing Copy</TabsTrigger>
+          <TabsTrigger value="seo" className="shrink-0">SEO & Meta</TabsTrigger>
         </TabsList>
 
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -404,6 +404,21 @@ export function Settings() {
               </div>
             </div>
           </TabsContent>
+
+          <div className="mt-6 flex justify-end">
+            <Button 
+              type="submit" 
+              disabled={!isDirty || isSaving}
+              className="btn-accent w-full sm:w-auto"
+            >
+              {isSaving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
+              Save Changes
+            </Button>
+          </div>
         </form>
       </Tabs>
     </div>
