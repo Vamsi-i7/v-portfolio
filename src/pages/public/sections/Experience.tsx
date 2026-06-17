@@ -35,7 +35,7 @@ export function Experience() {
       >
         <div className="mb-12">
           <span className="text-[10px] font-mono uppercase tracking-[0.5em] text-white/30 mb-4 block">Experience</span>
-          <RevealText text="Professional Path" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-white uppercase" />
+          <RevealText id="experience-title" text="Professional Path" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-white uppercase" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -61,7 +61,7 @@ export function Experience() {
                 <div className="flex items-start gap-3.5">
                   <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center p-2 shrink-0 group-hover:bg-white/10 transition-colors">
                     {logoUrl ? (
-                      <img src={logoUrl} alt="" className="w-full h-full object-contain opacity-60 group-hover:opacity-100 transition-opacity" />
+                      <img src={logoUrl} alt="" loading="lazy" className="w-full h-full object-contain opacity-60 group-hover:opacity-100 transition-opacity" />
                     ) : (
                       <Building2 className="w-5 h-5 text-white/20" />
                     )}

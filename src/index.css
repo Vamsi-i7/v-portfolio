@@ -88,6 +88,17 @@
   font-display: swap;
 }
 
+/* Devicon font-display override */
+@font-face {
+  font-family: 'devicon';
+  src: url('https://cdn.jsdelivr.net/gh/devicons/devicon@latest/fonts/devicon.woff?qd25fp') format('woff'),
+       url('https://cdn.jsdelivr.net/gh/devicons/devicon@latest/fonts/devicon.ttf?qd25fp') format('truetype'),
+       url('https://cdn.jsdelivr.net/gh/devicons/devicon@latest/fonts/devicon.svg?qd25fp#devicon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ─── Design Tokens (CSS Custom Properties) ─────────────────────────────────
    PRD §5.2 — Color System
    PRD §5.3 — Typography System
@@ -355,7 +366,7 @@
     text-decoration: none;
   }
 
-  a:hover:not(:disabled) {
+  a:hover {
     color: var(--accent-primary-dark);
   }
 

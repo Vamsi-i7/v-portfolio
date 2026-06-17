@@ -73,6 +73,7 @@ export function Certificates() {
                     <img
                       src={getPublicUrl('portfolio-assets', cert.certificate_image_path!)}
                       alt={cert.title}
+                      loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -94,7 +95,7 @@ export function Certificates() {
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded bg-white flex items-center justify-center shrink-0 overflow-hidden border border-bg-border">
                     {logoUrl ? (
-                      <img src={logoUrl} alt={cert.issuer_name} className="w-full h-full object-contain p-1" />
+                      <img src={logoUrl} alt={cert.issuer_name} loading="lazy" className="w-full h-full object-contain p-1" />
                     ) : (
                       <Award className="w-4 h-4 text-black" />
                     )}

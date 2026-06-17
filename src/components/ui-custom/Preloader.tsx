@@ -15,7 +15,7 @@ export function Preloader({ onComplete }: PreloaderProps) {
     // Duration of focus reveal + loading bar fill-up
     const timer = setTimeout(() => {
       setIsExiting(true)
-    }, 2200)
+    }, 1400)
 
     return () => {
       clearTimeout(timer)
@@ -36,7 +36,7 @@ export function Preloader({ onComplete }: PreloaderProps) {
           exit={{ 
             opacity: 0,
             transition: { 
-              duration: 0.8, 
+              duration: 0.6, 
               ease: [0.85, 0, 0.15, 1] 
             }
           }}
@@ -59,13 +59,13 @@ export function Preloader({ onComplete }: PreloaderProps) {
                   filter: 'blur(0px)', 
                   letterSpacing: '0.08em', 
                   scale: 1,
-                  transition: { duration: 1.4, ease: [0.16, 1, 0.3, 1] } 
+                  transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } 
                 }}
                 exit={{
-                  scale: 3.5,
-                  filter: 'blur(35px)',
+                  scale: 2.0,
+                  filter: 'blur(15px)',
                   opacity: 0,
-                  transition: { duration: 0.75, ease: [0.85, 0, 0.15, 1] }
+                  transition: { duration: 0.4, ease: [0.85, 0, 0.15, 1] }
                 }}
                 className="text-6xl sm:text-7xl md:text-8xl text-white font-display font-black leading-none uppercase select-none relative z-0"
               >
@@ -77,8 +77,8 @@ export function Preloader({ onComplete }: PreloaderProps) {
             <motion.div 
               exit={{ 
                 opacity: 0, 
-                y: 15,
-                transition: { duration: 0.4, ease: 'easeIn' }
+                y: 10,
+                transition: { duration: 0.3, ease: 'easeIn' }
               }}
               className="w-36 h-[2px] bg-white/10 rounded-full mt-6 relative overflow-hidden"
             >
@@ -87,7 +87,7 @@ export function Preloader({ onComplete }: PreloaderProps) {
                 animate={{ 
                   width: '100%',
                   transition: { 
-                    duration: 2.0, 
+                    duration: 1.4, 
                     ease: [0.22, 1, 0.36, 1] 
                   }
                 }}

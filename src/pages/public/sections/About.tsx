@@ -40,10 +40,8 @@ const DEFAULT_PRINCIPLES = [
 ]
 
 export function About() {
-  const { data: settings, isLoading } = useSettings()
+  const { data: settings } = useSettings()
   const { data: certificates } = useCertificates()
-
-  if (isLoading) return null
 
   const profileImageUrl = settings?.profile_image_path 
     ? getPublicUrl('portfolio-assets', settings.profile_image_path)
@@ -53,7 +51,7 @@ export function About() {
     <AnimatedSection id="about" className="section-container relative" aria-labelledby="about-title">
       <div className="mb-16">
         <span className="text-[10px] font-mono uppercase tracking-[0.5em] text-white/30 mb-4 block">Identity</span>
-        <RevealText text="Engineering Philosophy" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-white uppercase" />
+        <RevealText id="about-title" text="Engineering Philosophy" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-white uppercase" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
@@ -65,6 +63,7 @@ export function About() {
                 <img 
                   src={profileImageUrl} 
                   alt={settings?.full_name || 'Profile'} 
+                  loading="lazy"
                   className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-1000 group-hover:scale-105 opacity-80 group-hover:opacity-100"
                 />
               ) : (
@@ -84,7 +83,7 @@ export function About() {
           {/* Compact Certifications - Merged as Proof */}
           {certificates && certificates.length > 0 && (
             <div className="space-y-6 pt-4">
-              <h4 className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Verified Credentials</h4>
+              <h3 className="text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">Verified Credentials</h3>
               <div className="grid grid-cols-1 gap-3">
                 {certificates.slice(0, 3).map((cert) => (
                   <div key={cert.id} className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02] border border-white/5 group hover:border-accent-primary/20 transition-all">
@@ -147,7 +146,7 @@ function PrincipleItem({ title, desc, icon }: { title: string, desc: string, ico
         <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent-primary/60 group-hover:text-accent-primary group-hover:bg-accent-primary/10 transition-all border border-white/5 group-hover:border-accent-primary/20">
           {icon}
         </div>
-        <h4 className="text-sm font-black text-white uppercase tracking-[0.2em] group-hover:text-white transition-colors">{title}</h4>
+        <h3 className="text-sm font-black text-white uppercase tracking-[0.2em] group-hover:text-white transition-colors">{title}</h3>
       </div>
       <p className="text-xs text-white/40 leading-relaxed font-medium group-hover:text-white/60 transition-colors">{desc}</p>
     </div>

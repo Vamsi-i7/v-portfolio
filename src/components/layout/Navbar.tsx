@@ -38,7 +38,7 @@ export function Navbar() {
         <a 
           href="#home" 
           className="font-display font-black text-xl tracking-tightest text-white uppercase transition-all hover:text-accent-primary flex items-center gap-2 shrink-0"
-          aria-label="Home"
+          aria-label={`${settings?.full_name || 'Vamsi Krishna'} - Home`}
         >
           <div className="w-2 h-2 rounded-full bg-accent-primary" />
           <div className="flex items-baseline">

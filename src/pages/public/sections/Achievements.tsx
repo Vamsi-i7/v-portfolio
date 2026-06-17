@@ -22,7 +22,7 @@ export function Achievements() {
     <AnimatedSection id="achievements" className="section-container relative py-12 md:py-16" aria-labelledby="achievements-title">
       <div className="mb-12">
         <span className="text-[10px] font-mono uppercase tracking-[0.5em] text-accent-primary mb-3 block">Milestones</span>
-        <RevealText text="Recognition" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-primary uppercase" />
+        <RevealText id="achievements-title" text="Recognition" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-primary uppercase" />
       </div>
 
       <div className="flex flex-wrap gap-6 justify-center max-w-5xl mx-auto">
@@ -98,7 +98,7 @@ function AchievementCard({ achievement, index }: { achievement: Achievement, ind
       whileInView={{ opacity: 1, scale: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ type: "spring", stiffness: 100, damping: 15, delay: index * 0.05 }}
-      className="group flex flex-col w-full sm:w-[260px] h-[140px] p-5 rounded-2xl bg-gradient-to-b from-white/[0.03] to-transparent border border-white/[0.06] backdrop-blur-md hover:border-accent-primary/20 hover:bg-white/[0.04] transition-all justify-between shadow-[0_4px_24px_rgba(0,0,0,0.4)] hover:shadow-[0_4px_30px_rgba(0,0,0,0.6)] relative overflow-hidden cursor-default"
+      className="group flex flex-col w-full sm:w-[260px] h-[170px] p-5 rounded-2xl bg-gradient-to-b from-white/[0.03] to-transparent border border-white/[0.06] backdrop-blur-md hover:border-accent-primary/20 hover:bg-white/[0.04] transition-all justify-between shadow-[0_4px_24px_rgba(0,0,0,0.4)] hover:shadow-[0_4px_30px_rgba(0,0,0,0.6)] relative overflow-hidden cursor-default"
       style={tiltStyle}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -108,7 +108,7 @@ function AchievementCard({ achievement, index }: { achievement: Achievement, ind
 
       {/* Icon & Year */}
       <div className="flex justify-between items-start relative z-10">
-        <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-accent-primary/10 transition-colors duration-300">
+        <div className="w-7 h-7 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-accent-primary/10 transition-colors duration-300">
           <IconComponent className="w-4 h-4 text-accent-primary group-hover:scale-110 transition-transform duration-300" />
         </div>
         {year && (
