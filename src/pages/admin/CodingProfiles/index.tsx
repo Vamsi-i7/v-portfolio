@@ -137,7 +137,7 @@ export function CodingProfilesPage() {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-display font-bold tracking-tight">Coding Profiles</h1>
           <p className="text-muted-foreground mt-1">
@@ -147,7 +147,7 @@ export function CodingProfilesPage() {
         <Button 
           onClick={handleSubmit(onSubmit)} 
           disabled={!isDirty || isSaving}
-          className="btn-accent"
+          className="btn-accent shrink-0 w-full sm:w-auto"
         >
           {isSaving ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/incompatible-library */
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -60,6 +60,7 @@ type SettingsFormValues = z.infer<typeof settingsSchema>
 
 export function Settings() {
   const { data: settings, isLoading } = useSettings()
+  const [activeTab, setActiveTab] = useState("profile")
   const { mutateAsync: saveSettings, isPending: isSaving } = useMutateSettings()
   const { toast } = useToast()
 
@@ -172,7 +173,7 @@ export function Settings() {
 
   return (
     <div className="space-y-6 max-w-5xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-display font-bold tracking-tight">Settings</h1>
           <p className="text-muted-foreground mt-1">
@@ -182,7 +183,7 @@ export function Settings() {
         <Button 
           onClick={handleSubmit(onSubmit)} 
           disabled={!isDirty || isSaving}
-          className="btn-accent"
+          className="btn-accent shrink-0 w-full sm:w-auto"
         >
           {isSaving ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -193,8 +194,25 @@ export function Settings() {
         </Button>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="bg-surface border border-border">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        {/* Mobile Dropdown Selector */}
+        <div className="md:hidden w-full">
+          <select
+            id="tab-select"
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
+            className="w-full h-[44px] bg-surface border border-border rounded-md px-[12px] text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+          >
+            <option value="profile">Profile Settings</option>
+            <option value="media">Media & Assets</option>
+            <option value="social">Social Links</option>
+            <option value="copy">Landing Copy</option>
+            <option value="seo">SEO & Meta</option>
+          </select>
+        </div>
+
+        {/* Desktop Tabs List */}
+        <TabsList className="bg-surface border border-border hidden md:flex w-full justify-center">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="media">Media & Assets</TabsTrigger>
           <TabsTrigger value="social">Social Links</TabsTrigger>
@@ -404,6 +422,21 @@ export function Settings() {
               </div>
             </div>
           </TabsContent>
+
+          <div className="mt-6 flex justify-end">
+            <Button 
+              type="submit" 
+              disabled={!isDirty || isSaving}
+              className="btn-accent w-full sm:w-auto"
+            >
+              {isSaving ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 h-4 w-4" />
+              )}
+              Save Changes
+            </Button>
+          </div>
         </form>
       </Tabs>
     </div>

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { 
@@ -10,7 +11,9 @@ import {
   Award, 
   Code2, 
   Terminal, 
-  Settings 
+  Settings,
+  Menu,
+  X
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -28,6 +31,7 @@ const navItems = [
 
 export function AdminLayout() {
   const navigate = useNavigate()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
@@ -35,9 +39,9 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-surface">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-border bg-base hidden flex-col md:flex">
+    <div className="flex h-screen overflow-hidden bg-surface">
+      {/* Sidebar (Desktop) */}
+      <aside className="w-64 border-r border-border bg-base hidden flex-col md:flex shrink-0 h-full">
         <div className="h-14 flex items-center px-4 border-b border-border">
           <span className="font-display font-bold text-sm tracking-wide uppercase text-accent">V Portfolio</span>
         </div>
@@ -73,14 +77,71 @@ export function AdminLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative">
         {/* Mobile Header (minimal) */}
-        <header className="h-14 border-b border-border bg-base flex items-center justify-between px-4 md:hidden">
-          <span className="font-display font-bold text-sm tracking-wide uppercase text-accent">V Portfolio</span>
+        <header className="h-14 border-b border-border bg-base flex items-center justify-between px-4 md:hidden relative z-50">
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle Navigation Menu"
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+            <span className="font-display font-bold text-sm tracking-wide uppercase text-accent">V Portfolio</span>
+          </div>
           <Button variant="ghost" size="icon" onClick={handleSignOut}>
             <LogOut className="h-4 w-4" />
           </Button>
         </header>
+
+        {/* Mobile Navigation Drawer */}
+        {isMobileMenuOpen && (
+          <div 
+            className="fixed inset-0 top-[56px] z-40 bg-black/60 backdrop-blur-sm md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <aside 
+              className="w-64 h-full border-r border-border bg-base flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.exact}
+                    className={({ isActive }) =>
+                      `flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                        isActive
+                          ? 'bg-accent text-accent-foreground'
+                          : 'text-muted-foreground hover:bg-surface hover:text-foreground'
+                      }`
+                    }
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </NavLink>
+                ))}
+              </nav>
+              <div className="p-4 border-t border-border">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false)
+                    handleSignOut()
+                  }}
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
+            </aside>
+          </div>
+        )}
 
         <div className="flex-1 p-6 overflow-y-auto">
           <Outlet />
