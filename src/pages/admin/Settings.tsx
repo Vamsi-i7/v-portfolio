@@ -25,7 +25,7 @@ const settingsSchema = z.object({
   tagline: z.string().optional().nullable(),
   bio: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
-  email: z.string().email('Invalid email').optional().nullable(),
+  email: z.string().email('Invalid email').or(z.literal('')).optional().nullable(),
   site_title: z.string().optional().nullable(),
   meta_description: z.string().optional().nullable(),
   profile_image_path: z.string().optional().nullable(),
@@ -217,6 +217,9 @@ export function Settings() {
                 <div className="space-y-2">
                   <Label htmlFor="email">Public Email</Label>
                   <Input id="email" type="email" {...register('email')} />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email.message}</p>
+                  )}
                 </div>
               </div>
               

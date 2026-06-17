@@ -130,6 +130,7 @@ export function ProjectSpotlight({ projects, onProjectChange }: ProjectSpotlight
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="p-3 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-white/20 transition-all"
+                        aria-label={`View ${project.title} source code on GitHub`}
                       >
                         <GitBranch className="w-5 h-5" />
                       </a>
@@ -153,6 +154,7 @@ export function ProjectSpotlight({ projects, onProjectChange }: ProjectSpotlight
           onClick={scrollPrev}
           className="p-4 rounded-full bg-black/50 border border-white/10 backdrop-blur-xl text-white hover:bg-accent-primary hover:text-black transition-all pointer-events-auto disabled:opacity-20 shadow-2xl"
           disabled={activeIndex === 0}
+          aria-label="Previous project"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
@@ -162,6 +164,7 @@ export function ProjectSpotlight({ projects, onProjectChange }: ProjectSpotlight
           onClick={scrollNext}
           className="p-4 rounded-full bg-black/50 border border-white/10 backdrop-blur-xl text-white hover:bg-accent-primary hover:text-black transition-all pointer-events-auto disabled:opacity-20 shadow-2xl"
           disabled={activeIndex === projects.length - 1}
+          aria-label="Next project"
         >
           <ChevronRight className="w-6 h-6" />
         </button>

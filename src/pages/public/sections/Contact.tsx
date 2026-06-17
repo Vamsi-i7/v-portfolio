@@ -73,7 +73,7 @@ export function Contact() {
     <AnimatedSection id="contact" className="section-container relative" aria-labelledby="contact-title">
       <div className="mb-16">
         <span className="text-[10px] font-mono uppercase tracking-[0.5em] text-white/30 mb-4 block">Communication</span>
-        <RevealText text="Initiate Impact" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-white uppercase" />
+        <RevealText id="contact-title" text="Initiate Impact" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-white uppercase" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">

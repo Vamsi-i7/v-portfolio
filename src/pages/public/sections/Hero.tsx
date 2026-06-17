@@ -38,17 +38,17 @@ export function Hero() {
   const leetcodeData = cacheEntries?.find(e => e.platform === 'leetcode')?.data as LeetcodeCache | undefined
   
   const latestExperience = experiences?.[0]
-  const projectCount = projects?.length || 0
+  const projectCount = projects?.length !== undefined ? projects.length : 3
 
-  const fullName = settings?.full_name || 'VAMSI KRISHNA'
+  const fullName = settings?.full_name || 'Vamsi Krishna'
   const resumeUrl = settings?.resume_path ? getPublicUrl('portfolio-assets', settings.resume_path) : null
 
   const showPreloader = typeof window !== 'undefined'
     ? (import.meta.env.DEV ? true : !sessionStorage.getItem('portfolio-preloaded'))
     : false
 
-  const delay1 = showPreloader ? 3000 : 600
-  const delay2 = showPreloader ? 3200 : 800
+  const delay1 = showPreloader ? 2000 : 300
+  const delay2 = showPreloader ? 2200 : 500
 
   return (
     <AnimatedSection 
@@ -90,14 +90,16 @@ export function Hero() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-primary"></span>
               </span>
               <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/50 group-hover:text-white/80 transition-colors">
-                {latestExperience ? latestExperience.role_title : 'Available for Impact'}
+                {latestExperience ? latestExperience.role_title : 'enineere'}
               </span>
             </div>
           </motion.div>
 
           {/* Primary Value Proposition */}
           <RevealText 
-            text={settings?.tagline || 'Building autonomous AI systems that think, learn, and ship.'}
+            id="hero-title"
+            tag="h1"
+            text={settings?.tagline || 'Full Stack Engineer • Systems Builder • AI Enthusiast'}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.05] tracking-tightest text-white mb-6 uppercase text-left w-full"
             delay={0.2}
           />

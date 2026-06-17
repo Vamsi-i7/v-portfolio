@@ -19,36 +19,36 @@ export function Home() {
       <JsonLd />
 
       <AnimatePresence mode="popLayout">
-        <motion.div key="home" layout className="relative">
+        <motion.div key="home" className="relative">
           <Hero />
         </motion.div>
 
         <Suspense fallback={<div className="h-[400px] w-full animate-pulse bg-white/5 rounded-3xl" />}>
-          <motion.div key="projects" layout className="relative py-16 md:py-24">
+          <motion.div key="projects" className="relative py-16 md:py-24">
             <Projects />
           </motion.div>
 
-          <motion.div key="engineering" layout className="relative py-16 md:py-24">
+          <motion.div key="engineering" className="relative py-16 md:py-24">
             <Skills />
           </motion.div>
 
-          <motion.div key="experience" layout className="relative">
+          <motion.div key="experience" className="relative">
             <Experience />
           </motion.div>
 
-          <motion.div key="achievements" layout className="relative py-16 md:py-24">
+          <motion.div key="achievements" className="relative py-16 md:py-24">
             <Achievements />
           </motion.div>
 
-          <motion.div key="certifications" layout className="relative py-16 md:py-24">
+          <motion.div key="certifications" className="relative py-16 md:py-24">
             <Certificates />
           </motion.div>
 
-          <motion.div key="about" layout className="relative py-16 md:py-24">
+          <motion.div key="about" className="relative py-16 md:py-24">
             <About />
           </motion.div>
 
-          <motion.div key="contact" layout className="relative py-16 md:py-24">
+          <motion.div key="contact" className="relative py-16 md:py-24">
             <Contact />
           </motion.div>
         </Suspense>

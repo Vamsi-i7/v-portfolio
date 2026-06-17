@@ -77,7 +77,7 @@ function FooterLink({ href, children }: { href: string, children: React.ReactNod
   return (
     <a 
       href={href}
-      className="text-[10px] font-bold text-white/20 hover:text-white transition-colors uppercase tracking-[0.1em]"
+      className="text-[10px] font-bold text-white/20 hover:text-white transition-colors uppercase tracking-[0.1em] py-1.5 inline-block"
     >
       {children}
     </a>

@@ -30,7 +30,7 @@ export function Projects() {
       <div className="mb-12 relative z-10">
         <span className="text-[10px] font-mono uppercase tracking-[0.5em] text-white/30 mb-4 block">Engineered Solutions</span>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <RevealText text="Project Spotlight" className="text-5xl sm:text-7xl font-display font-black tracking-tightest text-white uppercase" />
+          <RevealText id="projects-title" text="Project Spotlight" className="text-5xl sm:text-7xl font-display font-black tracking-tightest text-white uppercase" />
           <p className="max-w-md text-sm text-white/40 font-medium leading-relaxed">
             A selection of my most impactful works, from complex distributed systems to refined user experiences.
           </p>

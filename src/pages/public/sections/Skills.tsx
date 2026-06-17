@@ -95,7 +95,7 @@ export function Skills() {
     <AnimatedSection id="engineering" className="section-container relative py-16" aria-labelledby="dna-title">
       <div className="mb-16">
         <span className="text-[10px] font-mono uppercase tracking-[0.5em] text-white/30 mb-4 block">Dashboard</span>
-        <RevealText text="Engineering DNA" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-white uppercase" />
+        <RevealText id="dna-title" text="Engineering DNA" className="text-4xl sm:text-6xl font-display font-black tracking-tightest text-white uppercase" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
@@ -167,7 +167,7 @@ export function Skills() {
                         transition={{ duration: 0.3, delay: rIndex * 0.05 + sIndex * 0.02 }}
                         className="group flex items-center gap-2 cursor-default"
                       >
-                        <i className={`${getIconClass(skill)} text-sm text-white/10 group-hover:text-accent-primary transition-colors`} />
+                        <i className={`${getIconClass(skill)} text-sm text-white/10 group-hover:text-accent-primary transition-colors`} aria-hidden="true" />
                         <span className="text-[11px] font-bold text-white/40 group-hover:text-white transition-colors uppercase tracking-wider flex items-center gap-1">
                           {skill.name}
                           {skill.proficiency && (
