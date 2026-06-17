@@ -39,9 +39,9 @@ export function AdminLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-surface">
+    <div className="flex h-screen overflow-hidden bg-surface">
       {/* Sidebar (Desktop) */}
-      <aside className="w-64 border-r border-border bg-base hidden flex-col md:flex">
+      <aside className="w-64 border-r border-border bg-base hidden flex-col md:flex shrink-0 h-full">
         <div className="h-14 flex items-center px-4 border-b border-border">
           <span className="font-display font-bold text-sm tracking-wide uppercase text-accent">V Portfolio</span>
         </div>
@@ -77,7 +77,7 @@ export function AdminLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col relative">
+      <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative">
         {/* Mobile Header (minimal) */}
         <header className="h-14 border-b border-border bg-base flex items-center justify-between px-4 md:hidden relative z-50">
           <div className="flex items-center gap-2">
