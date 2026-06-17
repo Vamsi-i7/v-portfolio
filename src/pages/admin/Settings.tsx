@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/incompatible-library */
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -60,6 +60,7 @@ type SettingsFormValues = z.infer<typeof settingsSchema>
 
 export function Settings() {
   const { data: settings, isLoading } = useSettings()
+  const [activeTab, setActiveTab] = useState("profile")
   const { mutateAsync: saveSettings, isPending: isSaving } = useMutateSettings()
   const { toast } = useToast()
 
@@ -193,13 +194,30 @@ export function Settings() {
         </Button>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="bg-surface border border-border flex w-full overflow-x-auto whitespace-nowrap scrollbar-none justify-start md:justify-center md:flex-wrap">
-          <TabsTrigger value="profile" className="shrink-0">Profile</TabsTrigger>
-          <TabsTrigger value="media" className="shrink-0">Media & Assets</TabsTrigger>
-          <TabsTrigger value="social" className="shrink-0">Social Links</TabsTrigger>
-          <TabsTrigger value="copy" className="shrink-0">Landing Copy</TabsTrigger>
-          <TabsTrigger value="seo" className="shrink-0">SEO & Meta</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        {/* Mobile Dropdown Selector */}
+        <div className="md:hidden w-full">
+          <select
+            id="tab-select"
+            value={activeTab}
+            onChange={(e) => setActiveTab(e.target.value)}
+            className="w-full h-[44px] bg-surface border border-border rounded-md px-[12px] text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+          >
+            <option value="profile">Profile Settings</option>
+            <option value="media">Media & Assets</option>
+            <option value="social">Social Links</option>
+            <option value="copy">Landing Copy</option>
+            <option value="seo">SEO & Meta</option>
+          </select>
+        </div>
+
+        {/* Desktop Tabs List */}
+        <TabsList className="bg-surface border border-border hidden md:flex w-full justify-center">
+          <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="media">Media & Assets</TabsTrigger>
+          <TabsTrigger value="social">Social Links</TabsTrigger>
+          <TabsTrigger value="copy">Landing Copy</TabsTrigger>
+          <TabsTrigger value="seo">SEO & Meta</TabsTrigger>
         </TabsList>
 
         <form onSubmit={handleSubmit(onSubmit)}>
