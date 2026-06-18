@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ArrowLeft } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
@@ -69,7 +69,18 @@ export function Login() {
 
   return (
     <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md space-y-8">
+      <div className="w-full max-w-md space-y-6">
+        <div>
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/')}
+            className="group flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm pl-0 hover:bg-transparent"
+          >
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+            Back to Portfolio
+          </Button>
+        </div>
+
         <div className="text-center">
           <h2 className="text-3xl font-display font-bold tracking-tight">Admin Login</h2>
           <p className="mt-2 text-sm text-muted-foreground">
