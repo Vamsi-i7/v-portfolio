@@ -18,7 +18,15 @@ if (isPlaceholder && import.meta.env.DEV) {
   )
 }
 
-// Initialize client with fallback placeholder to prevent crash during builds
+// In production, fail immediately if env vars are missing to prevent
+// silently sending data to a placeholder endpoint
+if (isPlaceholder && !import.meta.env.DEV) {
+  throw new Error(
+    '[Supabase Client] FATAL: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY ' +
+    'are missing in production. Set these environment variables and rebuild.'
+  )
+}
+
 export const supabase = createClient<Database>(
   supabaseUrl || 'https://placeholder-project.supabase.co',
   supabaseAnonKey || 'placeholder-anon-key-fallback'

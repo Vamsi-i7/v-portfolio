@@ -90,7 +90,7 @@ export function Hero() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-primary"></span>
               </span>
               <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/50 group-hover:text-white/80 transition-colors">
-                {latestExperience ? latestExperience.role_title : 'enineere'}
+                {latestExperience ? latestExperience.role_title : 'Engineer'}
               </span>
             </div>
           </motion.div>
