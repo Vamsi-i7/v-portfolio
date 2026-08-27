@@ -10,6 +10,18 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+/**
+ * Escapes HTML special characters to prevent injection in email body.
+ */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 interface ContactPayload {
   name: string;
   email: string;
@@ -82,9 +94,9 @@ serve(async (req) => {
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
             <h2 style="color: #000; border-bottom: 1px solid #eee; padding-bottom: 10px;">New Contact Form Submission</h2>
-            <p><strong>From:</strong> ${name} (${email})</p>
+            <p><strong>From:</strong> ${escapeHtml(name)} (${escapeHtml(email)})</p>
             <p><strong>Message:</strong></p>
-            <div style="padding: 20px; background-color: #f9f9f9; border-radius: 8px; line-height: 1.5; white-space: pre-wrap;">${message}</div>
+            <div style="padding: 20px; background-color: #f9f9f9; border-radius: 8px; line-height: 1.5; white-space: pre-wrap;">${escapeHtml(message)}</div>
             <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
             <p style="font-size: 12px; color: #888;">This email was sent from your portfolio contact form.</p>
           </div>

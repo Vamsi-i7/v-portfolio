@@ -5,6 +5,7 @@ export function HeroScene() {
         src="https://my.spline.design/nexbotrobotcharacterconcept-2LuVKCsetuzZ5yCazQCNMDo4/" 
         className="w-full h-full pointer-events-auto border-0"
         title="Interactive 3D Robot"
+        sandbox="allow-scripts allow-same-origin"
         style={{
           background: 'transparent',
           colorScheme: 'dark',

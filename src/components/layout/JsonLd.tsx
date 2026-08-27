@@ -1,6 +1,17 @@
 import { useSettings } from '@/hooks/queries/useSettings'
 import { supabase } from '@/lib/supabase'
 
+/**
+ * Escapes a string for safe embedding inside a <script> tag's text content.
+ * Prevents breaking out of the JSON-LD block with </script> injection.
+ */
+function escapeScriptContent(str: string): string {
+  return str
+    .replace(/<\//g, '<\\/')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029')
+}
+
 export function JsonLd() {
   const { data: settings } = useSettings()
 
@@ -22,11 +33,11 @@ export function JsonLd() {
   const personSchema = {
     "@context": "https://schema.org",
     "@type": "Person",
-    "name": settings.full_name,
-    "jobTitle": settings.tagline || "Software Engineer",
+    "name": escapeScriptContent(String(settings.full_name || '')),
+    "jobTitle": escapeScriptContent(String(settings.tagline || 'Software Engineer')),
     "url": siteUrl,
     "image": profileImageUrl || undefined,
-    "description": settings.meta_description || settings.bio || undefined,
+    "description": escapeScriptContent(String(settings.meta_description || settings.bio || '')) || undefined,
     "sameAs": [
       socialLinks.github,
       socialLinks.linkedin,

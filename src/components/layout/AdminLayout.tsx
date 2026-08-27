@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
+import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import { 
   LogOut, 
   LayoutDashboard, 
@@ -31,9 +33,12 @@ const navItems = [
 
 export function AdminLayout() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleSignOut = async () => {
+    // Clear all cached data to prevent stale admin data from leaking
+    queryClient.clear()
     await supabase.auth.signOut()
     navigate('/admin/login', { replace: true })
   }
@@ -144,7 +149,9 @@ export function AdminLayout() {
         )}
 
         <div className="flex-1 p-6 overflow-y-auto">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </div>
       </main>
     </div>
